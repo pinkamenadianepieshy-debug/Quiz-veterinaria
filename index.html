@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Veterinário Completo</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    // PWA: Injeção dinâmica do manifest.json e Service Worker para manter o projeto em um único arquivo
+    const manifestData = {
+      "name": "Quiz Veterinário Completo",
+      "short_name": "Quiz Vet",
+      "description": "Aplicativo de estudo de clínica veterinária completo e prático.",
+      "start_url": "./",
+      "display": "standalone",
+      "background_color": "#10241d",
+      "theme_color": "#b05a2b",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b05a2b'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    };
+    
+    // Anexa o Manifest ao Head
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/manifest+json' });
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = URL.createObjectURL(manifestBlob);
+    document.head.appendChild(manifestLink);
+
+    // Registro do Service Worker via Blob (Cache básico)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swCode = `
+          const CACHE_NAME = 'quiz-vet-cache-v1';
+          
+          self.addEventListener('install', event => {
+            self.skipWaiting();
+          });
+          
+          self.addEventListener('activate', event => {
+            event.waitUntil(clients.claim());
+          });
+          
+          self.addEventListener('fetch', event => {
+            event.respondWith(
+              fetch(event.request).catch(() => caches.match(event.request))
+            );
+          });
+        `;
+        
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+          .then(reg => console.log('PWA: Service Worker Registrado com sucesso!'))
+          .catch(err => console.warn('PWA: Service Worker bloqueado pelas restrições de Blob do ambiente atual.', err));
+      });
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg: #10241d;
+      --surface: #e9dfc7;
+      --text: #1d2a22;
+      --primary: #b05a2b;
+      --secondary: #496a52;
+    }
+
+    html, body { height: 100%; box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(176,90,43,0.18), transparent 22%),
+        radial-gradient(circle at 85% 10%, rgba(73,106,82,0.22), transparent 20%),
+        radial-gradient(circle at 50% 100%, rgba(233,223,199,0.08), transparent 25%),
+        linear-gradient(180deg, #10241d 0%, #18382c 48%, #10241d 100%);
+      color: #f7f2e7;
+    }
+    .title-font { font-family: "Cormorant Garamond", serif; }
+    .grain {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0.08;
+      background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    .fade-up-delay { animation: fadeUp 0.7s ease both; animation-delay: 0.15s; }
+    .fade-up-delay-2 { animation: fadeUp 0.7s ease both; animation-delay: 0.3s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .answer-btn.correct { outline: 3px solid rgba(34,197,94,0.45); transform: translateY(-1px); }
+    .answer-btn.incorrect { outline: 3px solid rgba(239,68,68,0.38); }
+    .glass-edge { box-shadow: 0 10px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08); }
+    .badge { backdrop-filter: blur(10px); }
+    .level-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+    .level-facil { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .level-medio { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .level-dificil { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+  </style>
+</head>
+<body class="h-full">
+  <div id="app" class="relative h-full w-full overflow-auto">
+    <div class="grain"></div>
+    <header class="relative z-10 px-5 pt-6 pb-3 sm:px-8">
+      <div class="mx-auto max-w-6xl">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 badge">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full" id="brandBubble"> 
+              <i data-lucide="stethoscope" class="h-5 w-5"></i> 
+            </span>
+            <div>
+              <p class="text-xs uppercase tracking-[0.28em] text-white/60">Jogo de estudo</p>
+              <p class="text-sm font-semibold text-white/90">Clínica Veterinária Completa</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 badge">
+            <i data-lucide="brain" class="h-4 w-4"></i> <span>Treino com feedback imediato</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 pb-8 sm:px-8">
+      <section id="introCard" class="glass-edge fade-up overflow-hidden rounded-[28px] border border-white/10 bg-white/6">
+        <div class="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
+          <div class="p-6 sm:p-8 lg:p-10">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/70">
+              <i data-lucide="leaf" class="h-3.5 w-3.5"></i> anatomia • contenção • clínica
+            </div>
+            <h1 id="mainTitle" class="title-font text-5xl font-semibold leading-none text-[#f7f2e7] sm:text-6xl">Quiz Veterinário Completo</h1>
+            <p id="subtitleText" class="mt-4 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">Escolha uma área e responda perguntas com foco prático: casos clínicos comuns, complexos, anatomia aplicada e contenção de diversas espécies.</p>
+            <div class="mt-7 grid gap-3 sm:grid-cols-2">
+              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
+                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
+                  <i data-lucide="dog" class="h-5 w-5"></i>
+                </div>
+                <h2 class="text-lg font-semibold text-white">Pequenos Animais</h2>
+                <p class="mt-1 text-sm leading-relaxed text-white/70">Rotina clínica de cães e gatos, urgências, fisiologia e doenças infecciosas comuns.</p>
+              </article>
+              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
+                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
+                  <i data-lucide="tractor" class="h-5 w-5"></i>
+                </div>
+                <h2 class="text-lg font-semibold text-white">Grandes Animais</h2>
+                <p class="mt-1 text-sm leading-relaxed text-white/70">Bovinos, ovinos e caprinos. Manejo de rebanho, distúrbios metabólicos e anatomia de ruminantes.</p>
+              </article>
+              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
+                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
+                  <i data-lucide="horse" class="h-5 w-5"></i>
+                </div>
+                <h2 class="text-lg font-semibold text-white">Equinos</h2>
+                <p class="mt-1 text-sm leading-relaxed text-white/70">Síndrome cólica, claudicação, vias aéreas, contenção física e avaliação biomecânica.</p>
+              </article>
+              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
+                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
+                  <i data-lucide="bird" class="h-5 w-5"></i>
+                </div>
+                <h2 class="text-lg font-semibold text-white">Silvestres</h2>
+                <p class="mt-1 text-sm leading-relaxed text-white/70">Aves, répteis e exóticos. Estresse de contenção, doenças metabólicas e parâmetros vitais.</p>
+              </article>
+            </div>
+            <button id="startButton" class="mt-8 inline-flex items-center gap-3 rounded-full px-6 py-3 text-base font-bold text-white transition duration-200 focus:outline-none focus:ring-4 focus:ring-white/30"> 
+              <i data-lucide="play" class="h-5 w-5"></i> 
+              <span id="startButtonLabel">Começar jogo</span> 
+            </button>
+          </div>
+          <aside class="relative overflow-hidden border-t border-white/10 bg-[#eadfc7] text-[#1d2a22] lg:border-l lg:border-t-0">
+            <div class="absolute inset-0 opacity-70" style="background:
+                  radial-gradient(circle at 25% 25%, rgba(176,90,43,0.18), transparent 24%),
+                  radial-gradient(circle at 75% 75%, rgba(73,106,82,0.18), transparent 24%),
+                  linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08));"></div>
+            <div class="relative p-6 sm:p-8 lg:p-10">
+              <h2 class="title-font text-3xl font-semibold">Como funciona</h2>
+              <div class="mt-5 space-y-4 text-sm leading-relaxed">
+                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold">1. Escolha a espécie</p>
+                  <p class="mt-1 text-black/70">Pequenos, Grandes, Equinos ou Silvestres.</p>
+                </div>
+                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold">2. Escolha o tema</p>
+                  <p class="mt-1 text-black/70">Anatomia, contenção, casos comuns, complexos ou Treino.</p>
+                </div>
+                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold">3. Responda e aprenda</p>
+                  <p class="mt-1 text-black/70">Cada resposta traz a justificativa logo em seguida para você fixar o conteúdo.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+      
+      <section id="gameSection" class="hidden">
+        <div class="grid gap-6 lg:grid-cols-[300px_1fr]">
+          <aside class="glass-edge fade-up rounded-[26px] border border-white/10 bg-white/6 p-5">
+            <h2 class="title-font text-3xl font-semibold text-[#f7f2e7]">Temas</h2>
+            <p class="mt-2 text-sm text-white/70">Escolha os blocos para jogar.</p>
+            <div class="mb-4 rounded-2xl border border-white/10 bg-black/10 p-4 mt-4">
+              <p class="text-xs uppercase tracking-[0.22em] text-white/50">1. Escolha a espécie</p>
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <button data-species="pequenos" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
+                  <i data-lucide="dog" class="h-5 w-5"></i> Pequenos 
+                </button> 
+                <button data-species="grandes" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
+                  <i data-lucide="tractor" class="h-5 w-5"></i> Grandes 
+                </button>
+                <button data-species="equino" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
+                  <i data-lucide="horse" class="h-5 w-5"></i> Equinos 
+                </button> 
+                <button data-species="silvestre" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
+                  <i data-lucide="bird" class="h-5 w-5"></i> Silvestres 
+                </button>
+              </div>
+            </div>
+            <nav class="mt-5 grid gap-3" aria-label="Categorias do quiz">
+              <p class="text-xs uppercase tracking-[0.22em] text-white/50">2. Escolha o tema</p>
+              <button data-category="anatomia" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="bone" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Anatomia aplicada</div>
+                    <div class="text-sm text-white/65" id="anatomySubtitle">Selecione a espécie</div>
+                  </div>
+                </div>
+              </button> 
+              <button data-category="contencao" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="shield" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Contenção</div>
+                    <div class="text-sm text-white/65" id="contencaoSubtitle">Selecione a espécie</div>
+                  </div>
+                </div>
+              </button> 
+              <button data-category="comuns" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="clipboard-plus" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Casos comuns</div>
+                    <div class="text-sm text-white/65" id="comunsSubtitle">Selecione a espécie</div>
+                  </div>
+                </div>
+              </button> 
+              <button data-category="complexos" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="flask-conical" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Casos complexos</div>
+                    <div class="text-sm text-white/65" id="complexosSubtitle">Selecione a espécie</div>
+                  </div>
+                </div>
+              </button> 
+              <button data-category="treino" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="graduation-cap" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Modo Treino</div>
+                    <div class="text-sm text-white/65" id="treinoSubtitle">Fácil → Médio → Difícil</div>
+                  </div>
+                </div>
+              </button> 
+              <hr class="border-white/10 my-2">
+              <button id="mixButton" class="rounded-2xl border border-dashed border-white/20 bg-white/5 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="shuffle" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Rodada mista</div>
+                    <div class="text-sm text-white/65">Todas as espécies</div>
+                  </div>
+                </div>
+              </button> 
+              <button id="infiniteButton" class="rounded-2xl border border-white/15 bg-white/10 p-4 text-left text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="zap" class="h-5 w-5"></i>
+                  <div>
+                    <div class="font-semibold">Desafio contínuo</div>
+                    <div class="text-sm text-white/65">Até errar 5 questões</div>
+                  </div>
+                </div>
+              </button>
+            </nav>
+            <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
+              <p class="text-xs uppercase tracking-[0.22em] text-white/50">Desempenho atual</p>
+              <div class="mt-3 flex items-end justify-between gap-4">
+                <div>
+                  <p id="scoreValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0</p>
+                  <p class="text-sm text-white/65">acertos</p>
+                </div>
+                <div>
+                  <p id="errorValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0</p>
+                  <p class="text-sm text-white/65">erros</p>
+                </div>
+                <div>
+                  <p id="progressValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0/0</p>
+                  <p class="text-sm text-white/65">respondidas</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+          
+          <section class="fade-up-delay">
+            <div id="welcomePanel" class="glass-edge rounded-[26px] border border-white/10 bg-white/6 p-6 sm:p-8">
+              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/60">
+                <i data-lucide="sparkles" class="h-3.5 w-3.5"></i> pronto para estudar
+              </div>
+              <h2 class="title-font mt-4 text-4xl font-semibold text-[#f7f2e7]">Selecione uma espécie e um tema</h2>
+              <p class="mt-3 max-w-2xl text-white/72">O jogo traz perguntas com quatro alternativas e uma explicação curta após cada resposta. Ideal para revisar rapidamente e fixar os macetes clínicos e anatômicos essenciais.</p>
+            </div>
+            
+            <div id="quizPanel" class="glass-edge hidden rounded-[26px] border border-white/10 bg-white/6 p-5 sm:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div id="categoryPill" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/65"></div>
+                  <h2 id="questionText" class="title-font mt-4 text-3xl font-semibold text-[#f7f2e7] sm:text-4xl"></h2>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <div id="levelBadgeDisplay" class="level-badge"></div>
+                  <div class="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-right">
+                    <p class="text-xs uppercase tracking-[0.22em] text-white/50">Pergunta</p>
+                    <p id="questionCounter" class="text-lg font-semibold text-white"></p>
+                  </div>
+                </div>
+              </div>
+              <div id="answersGrid" class="mt-6 grid gap-3"></div>
+              <div id="feedbackBox" class="mt-6 hidden rounded-2xl border p-4">
+                <p id="feedbackTitle" class="font-bold"></p>
+                <p id="feedbackText" class="mt-2 leading-relaxed"></p>
+              </div>
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button id="nextButton" class="hidden rounded-full px-5 py-3 font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Próxima pergunta </button> 
+                <button id="restartRoundButton" class="hidden rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Jogar esta categoria de novo </button>
+              </div>
+            </div>
+            
+            <div id="resultPanel" class="glass-edge hidden rounded-[26px] border border-white/10 bg-white/6 p-6 sm:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/60">
+                    <i data-lucide="medal" class="h-3.5 w-3.5"></i> rodada concluída
+                  </div>
+                  <h2 class="title-font mt-4 text-4xl font-semibold text-[#f7f2e7]">Resultado</h2>
+                  <p id="resultSummary" class="mt-3 text-white/75"></p>
+                </div>
+                <div class="rounded-[24px] border border-white/10 bg-[#eadfc7] px-6 py-5 text-center text-[#1d2a22]">
+                  <p class="text-xs uppercase tracking-[0.22em] text-black/55">Pontuação</p>
+                  <p id="finalScore" class="title-font text-5xl font-semibold">0/0</p>
+                </div>
+              </div>
+              <div class="mt-6 grid gap-3 sm:grid-cols-3">
+                <button id="playAgainButton" class="rounded-full px-5 py-3 font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Jogar outra rodada </button> 
+                <button id="backCategoriesButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Ver categorias </button> 
+                <button id="reviewButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Revisar respostas </button>
+              </div>
+              <div id="reviewList" class="mt-6 hidden space-y-3"></div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <script>
+    const defaultConfig = {
+      background_color: "#10241d",
+      surface_color: "#e9dfc7",
+      text_color: "#1d2a22",
+      primary_action_color: "#b05a2b",
+      secondary_action_color: "#496a52",
+      font_family: "Cormorant Garamond",
+      font_size: 18,
+      main_title: "Quiz Veterinário Completo",
+      subtitle_text: "Escolha uma área e responda perguntas com foco prático: casos clínicos comuns, complexos, anatomia aplicada e contenção de diversas espécies.",
+      start_button_text: "Começar jogo"
+    };
+
+    const quizData = {
+      // ---------------- PEQUENOS ANIMAIS ----------------
+      anatomia_pequenos: [
+        { question: "Qual é a fórmula dentária completa (dentes permanentes) de um cão adulto?", options: ["30 dentes", "32 dentes", "42 dentes", "44 dentes"], answer: 2, explanation: "Cães adultos possuem 42 dentes permanentes (I3/3, C1/1, P4/4, M2/3).", level: "facil", species: "pequenos" },
+        { question: "Quantos lobos compõem o pulmão direito de um cão ou gato?", options: ["2 lobos", "3 lobos", "4 lobos", "6 lobos"], answer: 2, explanation: "O pulmão direito dos pequenos animais é formado por 4 lobos: cranial, médio, caudal e acessório.", level: "medio", species: "pequenos" },
+        { question: "Qual estrutura óssea é exclusiva dos carnívoros machos (cães, gatos, furões) e auxilia na cópula?", options: ["Osso sesamoide ulnar", "Osso peniano (baculum)", "Sínfise isquiática móvel", "Cartilagem xifoide dupla"], answer: 1, explanation: "O osso peniano é uma estrutura presente no pênis destes animais.", level: "facil", species: "pequenos" },
+        { question: "Onde se abrem anatomicamente os ductos das glândulas adanais em cães e gatos?", options: ["Na base da cauda, dorsal ao ânus", "Lateralmente ao ânus, nas posições de 4 e 8 horas", "Internamente no esfíncter anal interno", "Na mucosa retal profunda"], answer: 1, explanation: "As glândulas adanais desaguam logo na transição mucocutânea do ânus, usualmente referidas nas posições de '4 e 8 horas' do relógio.", level: "medio", species: "pequenos" },
+        { question: "Em felinos, qual artéria é rotineiramente utilizada para palpação de pulso devido ao seu fácil acesso na face medial da coxa?", options: ["Artéria safena", "Artéria femoral", "Artéria poplítea", "Artéria ilíaca externa"], answer: 1, explanation: "A artéria femoral é a via de eleição para avaliação da frequência e qualidade do pulso em pequenos animais.", level: "facil", species: "pequenos" }
+      ],
+      contencao_pequenos: [
+        { question: "Ao necessitar puncionar a veia cefálica em um cão, onde o auxiliar deve realizar o garrote?", options: ["No terço proximal do membro pélvico", "No pescoço, pressionando a base da jugular", "Na região distal do úmero/proximal do rádio, rodando o membro externamente", "Acima do carpo, apenas na face palmar"], answer: 2, explanation: "O garrote para a cefálica faz-se segurando o membro torácico pela articulação do cotovelo e tracionando a pele/veia lateralmente.", level: "facil", species: "pequenos" },
+        { question: "Qual é a técnica de contenção mais indicada e 'cat-friendly' para gatos assustados durante exame geral?", options: ["Focinheira apertada de nylon", "Uso da técnica de toalha (burrito) com o mínimo de força", "Contenção pelo cangote suspendendo o animal no ar", "Derrubamento em decúbito lateral forçado"], answer: 1, explanation: "A técnica da toalha (burrito) restringe o movimento de forma segura, acalma o gato e previne arranhões sem excesso de força.", level: "facil", species: "pequenos" },
+        { question: "Por que se deve evitar segurar um cão braquicefálico (ex: Pug, Bulldog) pelo pescoço com força ou usar coleiras justas na clínica?", options: ["Causa fratura cervical instantânea", "Agrava a síndrome respiratória (colapso de traqueia/prolapso de olho)", "O cão fica mais agressivo que as outras raças", "Causa dilatação gástrica"], answer: 1, explanation: "Essas raças possuem vias aéreas muito comprometidas e olhos rasos. Pressão no pescoço pode causar asfixia grave ou proptose ocular.", level: "medio", species: "pequenos" },
+        { question: "Para contenção para ultrassonografia abdominal, qual o decúbito padrão utilizado em cães?", options: ["Decúbito esternal", "Decúbito dorsal utilizando calha acolchoada", "Decúbito lateral direito apenas", "Estação (em pé)"], answer: 1, explanation: "O decúbito dorsal numa calha em 'V' expõe adequadamente toda a janela abdominal para o transdutor.", level: "facil", species: "pequenos" }
+      ],
+      comuns_pequenos: [
+        { question: "Um filhote de cão, não vacinado, de 3 meses, apresenta diarreia sanguinolenta, vômitos severos e leucopenia profunda. A principal suspeita clínica é:", options: ["Coronavírus canino", "Parvovirose canina", "Giardíase", "Cinomose"], answer: 1, explanation: "A diarreia sanguinolenta fétida acompanhada de leucopenia acentuada em filhotes é o quadro clássico de Parvovirose.", level: "facil", species: "pequenos" },
+        { question: "Um cão idoso apresenta poliúria, polidipsia, abdome pendular e rarefação pilosa bilateral. Qual a doença endócrina mais comum associada?", options: ["Diabetes mellitus", "Hipertireoidismo", "Hiperadrenocorticismo (Síndrome de Cushing)", "Hipotireoidismo"], answer: 2, explanation: "Estes são sinais característicos de Cushing (excesso de cortisol).", level: "medio", species: "pequenos" },
+        { question: "Qual é o agente etiológico da PIF (Peritonite Infecciosa Felina)?", options: ["Lentivírus (FIV)", "Parvovírus felino (Panleucopenia)", "Coronavírus felino mutado", "Herpesvírus felino tipo 1"], answer: 2, explanation: "A PIF ocorre quando o Coronavírus entérico felino sofre uma mutação dentro do hospedeiro, tornando-se letal e disseminando-se nos macrófagos.", level: "medio", species: "pequenos" },
+        { question: "Cadela não castrada, 8 anos, apresenta poliúria, letargia e secreção vulvar purulenta 4 semanas após o estro. O diagnóstico primário é:", options: ["Piometra", "Cistite bacteriana", "TVT (Tumor Venéreo Transmissível)", "Brucelose"], answer: 0, explanation: "A piometra ocorre tipicamente no período diestro, mediada por progesterona, resultando em infeção uterina grave com risco de sepse.", level: "facil", species: "pequenos" },
+        { question: "Gato macho, castrado, obeso, de 4 anos dá entrada vocalizando muito e com estrangúria (dor ao urinar/tentativas improdutivas). A bexiga está distendida e dura. Trata-se de uma emergência de:", options: ["Insuficiência Renal Aguda por nefrotoxina", "Cistite idiopática simples", "Obstrução Uretral", "Ruptura de bexiga"], answer: 2, explanation: "A obstrução uretral (geralmente por plugues uretrais ou urólitos) é emergência fatal devido à hipercalemia e falência renal pós-renal se não desobstruído rápido.", level: "facil", species: "pequenos" }
+      ],
+      complexos_pequenos: [
+        { question: "Cão diabético apresenta-se letárgico, com vômitos, desidratado, hálito com odor cetônico e respiração de Kussmaul. No exame, glicemia > 500mg/dL. Qual o quadro clínico?", options: ["Coma hipoglicêmico", "Cetoacidose Diabética (CAD)", "Síndrome de Cushing aguda", "Insuficiência hepática"], answer: 1, explanation: "A CAD é uma complicação grave do diabetes não compensado, requerendo fluidoterapia agressiva e insulinoterapia regular/lenta.", level: "dificil", species: "pequenos" },
+        { question: "Na clínica de felinos, o que compreende a 'Tríade Felina'?", options: ["Cinomose, Hepatite e Leptospirose", "Panleucopenia, Rinotraqueíte e Calicivirose", "Colangite, Doença Inflamatória Intestinal (DII) e Pancreatite", "PIF, FIV e FeLV"], answer: 2, explanation: "Devido à anatomia do ducto biliar e pancreático maior felino (desaguam juntos), a inflamação nestes três órgãos (fígado/vias, pâncreas, intestino) frequentemente ocorre em conjunto.", level: "dificil", species: "pequenos" },
+        { question: "Yorkshire de 6 meses com atraso no crescimento, episódios de ptialismo e desorientação (sinais neurológicos) após se alimentar. Qual a suspeita congênita?", options: ["Shunt Portossistêmico (Desvio Portossistêmico)", "Hidrocefalia congênita", "Epilepsia Idiopática", "Megaesôfago"], answer: 0, explanation: "O Shunt impede a filtragem hepática do sangue portal. As toxinas (como amônia) pós-alimentação vão para o cérebro, causando encefalopatia hepática.", level: "dificil", species: "pequenos" },
+        { question: "No ecocardiograma de um cão com tosse crônica e sopro cardíaco sistólico audível em ápice esquerdo, detecta-se espessamento de valva mitral. Doença:", options: ["Persistência do Ducto Arterioso", "Cardiomiopatia Dilatada", "Endocardiose (Doença Valvar Mitral Degenerativa)", "Estenose Subaórtica"], answer: 2, explanation: "A Endocardiose (degeneração mixomatosa) é a cardiopatia mais comum em cães idosos de pequeno porte.", level: "dificil", species: "pequenos" },
+        { question: "Um cão desenvolve paralisia flácida ascendente 7 dias após ser mordido na mata. Não há sinais de agressividade, mas ele perde a voz e não engole. Diagnóstico provável no Brasil:", options: ["Raiva paralítica", "Botulismo", "Paralisia por carrapato", "Tétano"], answer: 2, explanation: "Muitos não consideram, mas carrapatos no Brasil podem causar toxicose grave. Todavia, a cinomose e a raiva paralítica também entram no diferencial neurológico.", level: "dificil", species: "pequenos" }
+      ],
+
+      // ---------------- GRANDES ANIMAIS ----------------
+      anatomia_grandes: [
+        { question: "Qual compartimento do estômago dos ruminantes é considerado o 'estômago verdadeiro' (glandular)?", options: ["Rúmen", "Retículo", "Omaso", "Abomaso"], answer: 3, explanation: "O abomaso secreta ácido clorídrico e enzimas digestivas, sendo funcionalmente equivalente ao estômago dos monogástricos.", level: "facil", species: "grandes" },
+        { question: "O rúmen ocupa primariamente qual lado da cavidade abdominal da vaca?", options: ["Lado direito", "Lado esquerdo", "Ocupa apenas a região ventral", "Está contido na cavidade pélvica"], answer: 1, explanation: "O rúmen ocupa quase toda a metade esquerda da cavidade abdominal, indo do diafragma à pelve.", level: "facil", species: "grandes" },
+        { question: "Na anatomia dos cascos de bovinos, ovinos e caprinos, o que os diferencia morfologicamente de um cavalo?", options: ["São formados por osso puro", "São cascos clivados (divididos em duas unhas)", "Não possuem sola", "Possuem três falanges em vez de duas"], answer: 1, explanation: "Grandes ruminantes e pequenos ruminantes são artiodáctilos (cascos clivados - apoio nos dedos 3 e 4).", level: "facil", species: "grandes" },
+        { question: "Qual a função primária do sulco retículo-omasal (goteira esofágica) em bezerros recém-nascidos?", options: ["Misturar o pasto com a saliva", "Permitir que o leite vá direto para o abomaso, evitando a fermentação no rúmen", "Expelir os gases da eructação", "Aumentar a absorção de água"], answer: 1, explanation: "A goteira fecha por reflexo (sucção do leite) e desvia o leite direto ao abomaso, pois o rúmen não está maduro.", level: "medio", species: "grandes" },
+        { question: "Em vacas, onde se localiza o linfonodo mamário (supramamário), importante para exame de mastite sistêmica?", options: ["Na base do pescoço", "Na região inguinal, caudal e dorsal à glândula mamária", "Axilar", "Dentro dos quartos mamários anteriores"], answer: 1, explanation: "A palpação destes linfonodos ajuda na avaliação de mastites e processos inflamatórios regionais.", level: "medio", species: "grandes" }
+      ],
+      contencao_grandes: [
+        { question: "Para realizar o exame de cascos em uma ovelha sem tronco, qual é a técnica de contenção manual mais eficiente e segura?", options: ["Amarrar as 4 patas deitada de lado", "Sentar a ovelha sobre seus membros posteriores (rumping)", "Puxar as duas orelhas firmemente", "Levantar pelo lã"], answer: 1, explanation: "Sentar a ovelha (posição de tosquia) a imobiliza quase completamente, permitindo o exame dos 4 cascos com segurança.", level: "facil", species: "grandes" },
+        { question: "Qual instrumento é utilizado nas narinas de touros agressivos para auxiliar no domínio durante a condução?", options: ["Bridão", "Cachimbo", "Argola nasal (formigão)", "Peia"], answer: 2, explanation: "A cartilagem nasal é muito sensível, e o uso da argola ou formigão confere controle no manejo de machos grandes.", level: "facil", species: "grandes" },
+        { question: "Na contenção química de bovinos, qual fármaco é notório por causar uma resposta muito potente mesmo em subdosagens comparado aos equinos?", options: ["Ketamina", "Xilazina", "Acepromazina", "Diazepam"], answer: 1, explanation: "Os ruminantes são extremamente sensíveis à Xilazina (alfa-2-agonista), precisando de doses até 10x menores que em cavalos.", level: "medio", species: "grandes" },
+        { question: "Para evitar o coice 'de varredura' lateral da vaca ao examinar o úbere, onde o veterinário deve se posicionar?", options: ["Na frente da vaca", "Bem afastado lateralmente", "Colado ao membro pélvico do animal, mantendo a mão no flanco", "Atrás da garupa"], answer: 2, explanation: "Estar colado ao membro reduz o impacto mecânico do coice (que ganha força com a distância) e antecipa o movimento.", level: "medio", species: "grandes" },
+        { question: "Qual o risco se um bovino for mantido em contenção em decúbito dorsal ou lateral por longos períodos na cirurgia?", options: ["Timpanismo ruminal agudo e asfixia", "Fratura espontânea de fêmur", "Perda completa dos cascos", "Cegueira temporária"], answer: 0, explanation: "O decúbito impede a eructação dos gases ruminais, levando ao timpanismo que comprime o diafragma e causa insuficiência respiratória.", level: "dificil", species: "grandes" }
+      ],
+      comuns_grandes: [
+        { question: "Doença viral altamente contagiosa, causa de embargo econômico global, caracterizada por vesículas na boca, tetos e cascos de ruminantes e suínos:", options: ["Raiva", "Língua Azul", "Febre Aftosa", "Diarreia Viral Bovina (BVD)"], answer: 2, explanation: "A Febre Aftosa (Picornaviridae) possui impacto absurdo e notificação obrigatória imediata.", level: "facil", species: "grandes" },
+        { question: "Teste simples usado a campo em rebanhos leiteiros para detecção de mastite subclínica, avaliando a viscosidade do leite misturado com reagente:", options: ["Exame de sangue completo", "CMT (California Mastitis Test)", "Urinálise", "Ultrassonografia mamária"], answer: 1, explanation: "O CMT reage com o DNA celular somático do leite; quanto mais espesso (gel), maior a inflamação subclínica.", level: "facil", species: "grandes" },
+        { question: "Ovinos ou caprinos com mucosa ocular (conjuntiva) extremamente pálida (branca). Qual é o parasita gastrointestinal mais provável e hematófago?", options: ["Fasciola hepatica", "Taenia saginata", "Haemonchus contortus", "Toxocara vitulorum"], answer: 2, explanation: "O Haemonchus suga grandes quantidades de sangue no abomaso, causando anemia severa. A coloração da mucosa é avaliada pelo método FAMACHA.", level: "medio", species: "grandes" },
+        { question: "Um boi confinado em dieta rica em grãos desenvolve subitamente inchaço severo no flanco esquerdo e dispneia acentuada. Suspeita clínica:", options: ["Cólica espasmódica", "Timpanismo ruminal", "Obstrução esofágica", "Pneumonia aguda"], answer: 1, explanation: "Dietas ricas em carboidratos ou leguminosas podem causar excesso de gases no rúmen (timpanismo espumoso), o que é emergência veterinária.", level: "facil", species: "grandes" },
+        { question: "Qual o agente bacteriano clássico que penetra via fumbilical ou oral em bezerros novinhos e causa onfaloflebite, diarreia e artrite séptica?", options: ["Escherichia coli", "Mycobacterium bovis", "Brucella abortus", "Clostridium chauvoei"], answer: 0, explanation: "A Colibacilose é a causa mais comum de septicemia neonatal secundária à falha na transferência de colostro.", level: "medio", species: "grandes" }
+      ],
+      complexos_grandes: [
+        { question: "Uma vaca de alta produção leiteira cai paralisada algumas horas após o parto. Ela está apática, pescoço em S, sem febre, pupilas dilatadas. Diagnóstico primário:", options: ["Hipocalcemia puerperal (Febre do leite)", "Cetose secundária", "Mastite aguda coliforme", "Raiva"], answer: 0, explanation: "A febre do leite é um quadro agudo de hipocalcemia decorrente da enorme demanda de cálcio para a produção de colostro.", level: "dificil", species: "grandes" },
+        { question: "Vaca 3 semanas pós-parto reduz consumo de silagem, emagrece, e, na auscultação com percussão ('ping' test) no flanco esquerdo entre 9-13ª costela, escuta-se um som metálico claro. Suspeita:", options: ["Timpanismo gasoso", "Deslocamento de Abomaso à Esquerda (DAE)", "Retículo-peritonite traumática", "Impacção de Omaso"], answer: 1, explanation: "O som de 'ping' no lado esquerdo com o abomaso atônico e cheio de gás deslocando-se cranio-dorsalmente ao rúmen é o sinal clássico de DAE.", level: "dificil", species: "grandes" },
+        { question: "Bovino confinado, recebendo alta carga de concentrado sem adaptação, apresenta incoordenação motora, cegueira, opistótono e estrabismo dorsomedial ('olhando as estrelas'). A suspeita é Polioencefalomalacia. Qual a deficiência/causa comum?", options: ["Falta de Vitamina A", "Deficiência de Tiamina (Vitamina B1) ou excesso de enxofre", "Hipomagnesemia", "Toxina do Tétano"], answer: 1, explanation: "A acidose ruminal crônica destrói a microbiota que sintetiza tiamina, ou dietas ricas em enxofre (DDGS) geram sulfeto de hidrogênio que lesa o córtex cerebral.", level: "dificil", species: "grandes" },
+        { question: "Vaca adulta que engoliu pedaço de arame/prego junto com forragem apresenta agora relutância ao andar, dor cifótica e murmúrios cardíacos abafados (pulso jugular ingurgitado). A perfuração ocorreu do retículo para o coração gerando:", options: ["Timpanismo ruminal crônico", "Retículo-pericardite Traumática", "Pneumonia aspirativa", "Endocardite bacteriana simples"], answer: 1, explanation: "A perfuração aguda pelo prego causa peritonite focal, avançando pelo diafragma em direção ao saco pericárdico.", level: "dificil", species: "grandes" },
+        { question: "Em um rebanho leiteiro, vacas prenhas apresentam abortos no terço final da gestação, sem sinais prévios, e as vacas permanecem saudáveis. A principal zoonose causadora em muitos países é:", options: ["Tuberculose bovina", "Clostridiose", "Brucelose (Brucella abortus)", "Carbúnculo sintomático"], answer: 2, explanation: "A Brucelose é uma doença reprodutiva devastadora, altamente zoonótica, causando abortos finais ('tempestade de abortos').", level: "dificil", species: "grandes" }
+      ],
+
+      // ---------------- EQUINOS (Originais) ----------------
+      anatomia_equino: [
+        { question: "Qual é a frequência cardíaca normal de um equino em repouso?", options: ["15 a 20 bpm", "28 a 40 bpm", "60 a 80 bpm", "100+ bpm"], answer: 1, explanation: "A frequência cardíaca normal em repouso em equinos varia de 28 a 40 bpm. Valores acima indicam dor, febre ou estresse.", level: "facil", species: "equino" },
+        { question: "No equino, qual estrutura é mais importante na dissipação de peso e impacto no casco?", options: ["Ranilha e coxim digital", "Linha branca", "Muralha dorsal apenas", "Coroa ungueal exclusivamente"], answer: 0, explanation: "A ranilha e o coxim digital ajudam muito na absorção de impacto e no retorno venoso, sendo fundamentais na biomecânica do casco.", level: "facil", species: "equino" },
+        { question: "Qual é o principal vaso sanguíneo que irriga o pulmão equino?", options: ["Artéria pulmonar", "Aorta", "Veia cava cranial", "Veia hepática"], answer: 0, explanation: "A artéria pulmonar é responsável pelo suprimento sanguíneo dos pulmões em equinos.", level: "facil", species: "equino" },
+        { question: "Em equinos, qual é a localização mais comum de úlceras gástricas?", options: ["Parte cranial do estômago", "Região da curvadura maior", "Região da curvadura menor", "Piloro"], answer: 2, explanation: "A curvadura menor (zona não-secretora) é o local mais comum de úlceras em equinos.", level: "facil", species: "equino" },
+        { question: "Qual é o tempo médio de gestação da égua?", options: ["9 meses", "10 meses", "11 meses (aprox. 335-345 dias)", "12 meses"], answer: 2, explanation: "A gestação em equinos dura aproximadamente 11 meses (335 a 345 dias).", level: "facil", species: "equino" },
+        { question: "A bolsa podotrocleal (bursa do osso navicular) em equinos comunica-se com qual articulação?", options: ["Articulação interfalangeana distal", "Articulação interfalangeana proximal", "Articulação metacarpofalangeana", "Articulação do boleto"], answer: 0, explanation: "A bursa podotrocleal comunica-se com a articulação interfalangeana distal.", level: "medio", species: "equino" },
+        { question: "Em relação ao crânio equino, qual forame permite a passagem do nervo trigêmio?", options: ["Forame magno", "Forame óptico", "Forame oval", "Forame pós-orbital"], answer: 2, explanation: "O forame oval é responsável pela passagem do nervo trigêmio em equinos.", level: "medio", species: "equino" },
+        { question: "Em equinos com suspeita de lesão do nervo radial, qual achado é mais esperado?", options: ["Incapacidade de avançar o membro e apoio sobre a face dorsal", "Perda de sensibilidade na cauda", "Paralisia facial unilateral", "Dificuldade apenas na mastigação"], answer: 0, explanation: "O nervo radial é importante para extensão do membro torácico. Sua lesão causa knuckling.", level: "medio", species: "equino" },
+        { question: "Qual é o nome do divertículo da tuba auditiva, exclusivo dos equinos e que pode ser local de infeções graves?", options: ["Bolsa sinovial faríngea", "Bolsa gutural", "Saco aéreo cervical", "Divertículo esofágico"], answer: 1, explanation: "A bolsa gutural é uma expansão da tuba de Eustáquio e possui grande importância clínica em equinos devido a infeções bacterianas (empiema) ou fúngicas.", level: "medio", species: "equino" },
+        { question: "Quantos pares de costelas um equino normalmente possui?", options: ["13 pares", "15 pares", "18 pares", "21 pares"], answer: 2, explanation: "A anatomia equina caracteriza-se pela presença de 18 pares de costelas.", level: "facil", species: "equino" },
+        { question: "Qual osso do carpo do equino, quando afetado, causa claudicação persistente em animais de alto desempenho?", options: ["Escafóide (osso da fileira proximal)", "Capitato", "Pisiforme", "Trapezóide"], answer: 0, explanation: "Fraturas do escafóide são comuns em cavalos de salto e causam claudicação progressiva.", level: "dificil", species: "equino" },
+        { question: "Durante a cirurgia para correção de cólica, o cirurgião expõe o intestino. Qual característica anatômica macroscópica principal diferencia o Cólon Maior do Intestino Delgado?", options: ["Ausência total de mesentério", "Presença de faixas (tênias) e saculações (haustros)", "Parede muscular lisa e translúcida", "Presença de vilosidades na serosa"], answer: 1, explanation: "O cólon maior apresenta tênias e haustros facilmente identificáveis.", level: "dificil", species: "equino" },
+        { question: "Em qual borda dentária se formam as 'pontas de esmalte' em equinos que necessitam de flutuação?", options: ["Borda lingual superior e vestibular inferior", "Borda vestibular superior e lingual inferior", "Apenas nas faces masticatórias", "Exclusivamente na crista alveolar"], answer: 1, explanation: "As pontas de esmalte formam-se na borda vestibular superior e na borda lingual inferior.", level: "dificil", species: "equino" }
+      ],
+      contencao_equino: [
+        { question: "Em equinos agitados para exame rápido, qual método de contenção física deve ser usado com cautela?", options: ["Cabresto simples", "Cachimbo/twitch labial", "Manta no dorso", "Elevação da cabeça"], answer: 1, explanation: "O twitch pode auxiliar em procedimentos breves, mas deve ser usado com critério e tempo curto.", level: "facil", species: "equino" },
+        { question: "Qual o método de contenção física básica mais utilizado para liberar endorfinas em equinos?", options: ["Peia nas 4 patas", "Derrubamento com cordas", "Uso de pito (cachimbo) no lábio superior", "Mordaça de boca"], answer: 2, explanation: "O cachimbo no lábio superior é um método clássico que ajuda a manter o cavalo calmo.", level: "facil", species: "equino" },
+        { question: "Qual a finalidade principal do uso do tronco de contenção (brete) em equinos?", options: ["Derrubar o animal com segurança", "Restringir os movimentos laterais e anteroposteriores para exames e palpitação", "Servir apenas para a vacinação", "Transporte a longa distância"], answer: 1, explanation: "O tronco restringe os movimentos do animal de forma segura para o médico veterinário realizar procedimentos como palpação retal ou ecografias.", level: "facil", species: "equino" },
+        { question: "Ao levantar um membro torácico de um equino para exame do casco, o examinador deve:", options: ["Ficar de frente para o animal", "Ficar de lado voltado para a garupa do cavalo", "Ficar debaixo do pescoço do animal", "Enlaçar o membro com uma corda"], answer: 1, explanation: "Ficar voltado para a garupa protege o examinador do membro e permite acompanhar a movimentação natural da articulação.", level: "medio", species: "equino" },
+        { question: "Qual é o risco principal da utilização prolongada de tranquilizantes alfa-2-agonistas em equinos?", options: ["Hipotermia", "Hipertensão excessiva", "Hipoxemia por depressão respiratória", "Aumento permanente da frequência cardíaca"], answer: 2, explanation: "Alfa-2-agonistas causam depressão respiratória significativa em equinos.", level: "medio", species: "equino" },
+        { question: "Para contenção de equinos com comportamento muito agressivo, qual técnica oferece melhor segurança?", options: ["Bolas de cano apenas", "Sedação adequada associada a técnicas físicas", "Força máxima sem auxílio farmacológico", "Liberação imediata"], answer: 1, explanation: "A sedação apropriada reduz riscos para a equipa e para o animal.", level: "dificil", species: "equino" },
+        { question: "Em um equino que resiste durante exame oftalmológico, qual método de contenção é mais seguro?", options: ["Puxar fortemente a cabeça para baixo", "Usar tampão ocular com pressão", "Sedação + bloqueio local + contenção suave", "Deixar animal completamente livre"], answer: 2, explanation: "A combinação de sedação, bloqueio local e contenção suave previne trauma ocular.", level: "dificil", species: "equino" }
+      ],
+      comuns_equino: [
+        { question: "Um equino com sudorese, taquicardia, raspando o chão com os cascos. Qual o diagnóstico mais provável?", options: ["Tétano", "Laminite", "Síndrome Cólica", "Encefalomielite"], answer: 2, explanation: "Esses sinais são clássicos de síndrome cólica.", level: "facil", species: "equino" },
+        { question: "Em um equino com casco quente e dor intensa, a principal suspeita é:", options: ["Laminite", "Ceratoconjuntivite", "Abscesso mandibular", "Broncopneumonia"], answer: 0, explanation: "A laminite cursa com dor podal intensa e calor nos cascos.", level: "facil", species: "equino" },
+        { question: "Equino apresenta claudicação severa após ferimento perfurante na sola do casco. Além da limpeza, qual é a profilaxia imediata obrigatória?", options: ["Administração de cálcio intravenoso", "Uso de soro e toxoide antitetânico", "Administração de corticoides alta dosagem", "Bloqueio articular proximal"], answer: 1, explanation: "Os equinos são extremamente sensíveis à toxina do tétano. Feridas no casco exigem profilaxia imediata.", level: "facil", species: "equino" },
+        { question: "Qual o endoparasita frequentemente associado a cólicas por espasmo ou intussusceção ileocecal em equinos?", options: ["Oxyuris equi", "Anoplocephala perfoliata", "Ascaris lumbricoides", "Fasciola hepatica"], answer: 1, explanation: "O ténia equina (Anoplocephala perfoliata) aglomera-se frequentemente na válvula ileocecal, originando alterações da motilidade e cólicas.", level: "medio", species: "equino" },
+        { question: "Parasita que causa endarterite e 'cólica tromboembólica' em equinos:", options: ["Ascaris", "Strongylus vulgaris", "Tenia", "Estrongiloides"], answer: 1, explanation: "Strongylus vulgaris causa endarterite e cólica tromboembólica nas artérias mesentéricas.", level: "medio", species: "equino" },
+        { question: "Um cavalo apresenta inchaço unilateral da face. Qual é o primeiro diagnóstico a descartar?", options: ["Sinusite", "Abscesso dentário", "Paralisia do trigêmio", "Fraturas mandibulares"], answer: 1, explanation: "Abscessos da raiz dentária superior são comuns e provocam inchaço fácil e exsudato nasal.", level: "facil", species: "equino" },
+        { question: "Um cavalo de salto com claudicação curada com bloqueio palmar digital. Qual a suspeita?", options: ["Articulação do curvilhão", "Articulação do boleto", "Tendão flexor superficial", "Aparelho podotroclear (Osso Navicular)"], answer: 3, explanation: "O bloqueio do nervo digital palmar que resolve a claudicação aponta para patologia no aparelho podotroclear.", level: "dificil", species: "equino" }
+      ],
+      complexos_equino: [
+        { question: "Um equino com dor abdominal intensa e refluxo gástrico volumoso sugere:", options: ["Obstrução de intestino delgado", "Cistite simples", "Laminite subclínica", "Miocardite viral"], answer: 0, explanation: "Refluxo gástrico elevado (vários litros retirados por sonda) aponta fortemente para obstrução de intestino delgado.", level: "medio", species: "equino" },
+        { question: "Cavalo de tração após repouso com dieta rica em carboidratos, marcha rígida, urina cor de 'café':", options: ["Piroplasmose", "Rabdomiólise de Esforço (Doença da Segunda-Feira)", "Leptospirose Aguda", "Insuficiência Renal Crônica"], answer: 1, explanation: "A rabdomiólise de esforço ocorre tipicamente quando se retoma o trabalho de forma intensa após dias de repouso com alto nível de grãos na dieta (urina escura = mioglobinúria).", level: "dificil", species: "equino" },
+        { question: "Um equino apresenta sinais neurológicos assimétricos progressivos: ataxia de pélvicos, tropeços e atrofia muscular focal. Serologia e LCR compatíveis com Sarcocystis neurona. Trata-se de:", options: ["Meningite Estreptocócica", "Vírus do Nilo Ocidental", "Mieloencefalite Protozoária Equina (EPM)", "Linfoma espinal"], answer: 2, explanation: "A Mieloencefalite Protozoária Equina (EPM) causa inflamação assimétrica do SNC com sintomatologia correspondente, transmitida pela contaminação com fezes de gambá.", level: "dificil", species: "equino" },
+        { question: "Durante a observação de um cavalo com abdómen agudo (cólica) grave, nota-se na mucosa oral o aparecimento de uma 'linha tóxica' (halo vermelho-púrpura junto aos dentes). O que isso indica?", options: ["Inflamação gengival leve", "Desidratação simples", "Endotoxemia e Síndrome de Resposta Inflamatória Sistémica (SIRS)", "Alergia à forragem"], answer: 2, explanation: "A linha tóxica representa estase venosa e endotoxemia (frequentemente isquémia intestinal/trombose), sendo um sinal de mau prognóstico.", level: "dificil", species: "equino" },
+        { question: "Equino com tosse crônica e som respiratório tipo 'pancada' (roaring). Suspeita:", options: ["Pneumonia bacteriana aguda", "Colapso de laringe", "Hemiplegia laríngea (Paresia Laríngea Recorrente)", "Abscessos pulmonares"], answer: 2, explanation: "A neuropatia laríngea recorrente provoca atrofia de um lado (geralmente esquerdo) causando o som clássico.", level: "dificil", species: "equino" },
+        { question: "Equino com hemartrose após trauma leve. Qual alteração coagulativa?", options: ["Apenas contusão", "Deficiência de fator VIII ou IX (Hemofilia)", "Aumento de plaquetas", "Hipercoagulabilidade"], answer: 1, explanation: "Hemartrose espontânea após trauma leve pode indicar distúrbio genético da coagulação.", level: "dificil", species: "equino" },
+        { question: "Equino com claudicação progressiva, perda de peso e úlceras orais. Agente provável:", options: ["Apenas bactérias gram-positivas", "Vírus da arterite equina (EAV)", "Afta equina (Rhinovirus)", "Apenas deficiência nutricional"], answer: 1, explanation: "Vírus da arterite equina causa úlceras orais e edemas localizados que levam a claudicação.", level: "dificil", species: "equino" }
+      ],
+
+      // ---------------- SILVESTRES (Expandido) ----------------
+      anatomia_silvestre: [
+        { question: "Em aves silvestres, qual característica anatômica exige cuidado especial durante contenção manual?", options: ["Ausência de esterno", "Presença de saco vitelino funcional", "Movimento esternal essencial para respiração", "Rins muito superficiais"], answer: 2, explanation: "A respiração das aves depende do movimento do esterno. Compressão excessiva pode causar insuficiência respiratória.", level: "facil", species: "silvestre" },
+        { question: "Quantos sacos aéreos existem, em média, no sistema respiratório de uma ave voadeira saudável?", options: ["2", "4", "7", "9"], answer: 3, explanation: "As aves possuem em média 9 sacos aéreos que se estendem inclusive para o interior dos ossos longos (ossos pneumáticos).", level: "medio", species: "silvestre" },
+        { question: "Nos répteis quelônios, qual região anatômica costuma ser mais segura para avaliação física inicial?", options: ["Bico e cavidade oral profunda", "Membros e janela de exteriorização", "Cauda com tração intensa", "Plastrão com percussão forte"], answer: 1, explanation: "A observação dos membros permite avaliação inicial segura, respeitando o comportamento defensivo.", level: "facil", species: "silvestre" },
+        { question: "Qual é a característica principal dos dentes de roedores silvestres em relação ao crescimento?", options: ["Param de crescer após a maturidade", "Crescem continuamente durante a vida", "Só crescem no inverno", "Perdem e reposicionam anualmente"], answer: 1, explanation: "Os dentes incisivos e os pré-molares/molares (em alguns roedores) crescem continuamente, exigindo desgaste constante (feno e folhas duras).", level: "facil", species: "silvestre" },
+        { question: "Onde se localiza a glândula uropigiana na maioria das aves?", options: ["Na base da cauda (dorso)", "Abaixo das asas (axilar)", "Na região ventral do pescoço", "Ao redor da cloaca"], answer: 0, explanation: "A glândula uropigiana localiza-se na base dorsal da cauda e secreta óleos essenciais para a impermeabilização e higiene das penas.", level: "facil", species: "silvestre" },
+        { question: "Em serpentes, o órgão de Jacobson está primariamente envolvido em qual sentido?", options: ["Visão infravermelha", "Audição de baixa frequência", "Equilíbrio", "Olfação/Quimiorreceção"], answer: 3, explanation: "O órgão vomeronasal (ou de Jacobson) no teto da boca recolhe partículas através da língua bífida e analisa estímulos químicos do ar.", level: "medio", species: "silvestre" },
+        { question: "A 'coaca' nas aves e répteis é a via comum final para quais sistemas orgânicos?", options: ["Apenas digestório", "Digestório e urinário", "Digestório, urinário e reprodutor", "Apenas reprodutor"], answer: 2, explanation: "A cloaca recebe fezes (coprodeu), urina/uratos (urodeu) e gametas/ovos (proctodeu).", level: "facil", species: "silvestre" },
+        { question: "Por que NÃO usar balão (cuff) inflável no tubo endotraqueal de aves?", options: ["Elas não possuem traqueia verdadeira", "Seus anéis traqueais são completos e causaria isquemia", "O balão obstrui a entrada de ar", "Aves respiram exclusivamente pela pele"], answer: 1, explanation: "Diferente dos mamíferos que têm cartilagem em formato de C, os anéis traqueais das aves são anéis fechados e rígidos. O cuff causaria necrose isquêmica.", level: "medio", species: "silvestre" },
+        { question: "Em primatas não-humanos (ex: saguis), qual característica do sistema urinário dificulta o cateterismo vesical?", options: ["Uretra muito curta", "Presença de osso peniano", "Músculos esfíncteres muito fortes", "Ausência de bexiga"], answer: 1, explanation: "Muitos primatas machos possuem osso peniano longo, dificultando a passagem de cateteres rígidos.", level: "medio", species: "silvestre" },
+        { question: "Qual é a principal diferença da hemodinâmica renal nas aves e répteis comparada aos mamíferos domésticos?", options: ["Apenas eliminam amônia pura", "Não possuem néfrons gomerulares", "Possuem Sistema Porta Renal", "O sangue não passa pelo rim, apenas pelo intestino"], answer: 2, explanation: "Eles possuem o sistema porta renal, que leva o fluxo venoso dos membros posteriores diretamente para o rim antes de ir para a veia cava. É por isso que não se aplica injetáveis potentes nos membros traseiros.", level: "dificil", species: "silvestre" }
+      ],
+      contencao_silvestre: [
+        { question: "Qual a forma mais segura de conter fisicamente um coelho evitando fratura de coluna?", options: ["Segurar apenas pelas orelhas", "Segurar pela nuca com apoio firme dos membros posteriores e da pelve", "Suspender pelas patas traseiras", "Abraçar o tórax sem apoiar as pernas"], answer: 1, explanation: "A força muscular dos membros traseiros do coelho combinada com o esqueleto frágil pode gerar fraturas lombares graves se ele chutar no vazio.", level: "facil", species: "silvestre" },
+        { question: "Na contenção de mamíferos silvestres de médio porte (quatis, raposas), qual deve ser a principal prioridade?", options: ["Imobilizar sem planejamento e de imediato", "Reduzir estresse e garantir a segurança biológica da equipe (EPI)", "Conter sempre pela cauda primeiro", "Trancar o animal em sala fechada sem luvas"], answer: 1, explanation: "Estes animais podem portar zoonoses perigosas (Raiva, esporotricose). EPI como luvas de raspa grossa e cambão/puçá são essenciais.", level: "facil", species: "silvestre" },
+        { question: "Qual o equipamento mais indicado e seguro para o transporte e restrição inicial de uma ave de rapina ferida?", options: ["Uma gaiola de arame pequena", "Restrição visual total com capuz específico ou manta, e caixa de papelão escura", "Mãos nuas", "Gaiola de vidro"], answer: 1, explanation: "As aves de rapina são caçadoras visuais. Remover a luz ou o campo de visão as acalma instantaneamente.", level: "facil", species: "silvestre" },
+        { question: "Ao conter fisicamente um lagarto de grande porte (como um Teiú adulto), quais estruturas devem ser imobilizadas como prioridade?", options: ["Apenas as patas traseiras", "A cabeça, mandíbula forte e a cauda-chicote", "O abdómen compressivamente", "A ponta da cauda"], answer: 1, explanation: "A mandíbula forte (mordida que não larga) e a cauda (usada como chicote) são as principais 'armas' de defesa do réptil e exigem domínio.", level: "medio", species: "silvestre" },
+        { question: "Qual o principal risco sistêmico ao perseguir e tentar conter fisicamente ungulados silvestres (ex: veados, antas) sem planejamento químico prévio?", options: ["Miopatia de Captura", "Choque Anafilático", "Insuficiência Hepática Aguda", "Torção Gástrica"], answer: 0, explanation: "O estresse extremo leva à liberação massiva de ácido lático, hipertermia letal e destruição muscular generalizada (miopatia de captura).", level: "medio", species: "silvestre" },
+        { question: "Ao conter uma serpente venenosa de grande porte (ex: Cascavel), qual equipamento é INDISPENSÁVEL?", options: ["Luvas finas de algodão", "Bastão de contenção (gancho herpetológico) ou pinça de segurança (tongs)", "Apenas as mãos com reflexo rápido e toalha", "Cinturão apertado"], answer: 1, explanation: "A regra de ouro é manter as mãos fora do raio de bote. Ganchos e pinças mantêm a distância segura da cabeça.", level: "medio", species: "silvestre" },
+        { question: "Qual é a melhor prática para conter uma ave silvestre minimizando as fraturas de voo (asas)?", options: ["Abraçar o corpo comprimindo o peito com força", "Imobilizar asas firmemente e de forma plana contra o corpo, envolvendo em toalha com o esterno livre", "Deixar asas completamente soltas", "Segurar ambas as asas elevadas atrás das costas"], answer: 1, explanation: "As asas contra o corpo não batem (não geram fratura). Deixar o esterno (quilha) livre permite os movimentos da respiração.", level: "medio", species: "silvestre" },
+        { question: "Em répteis anfíbios gigantes (jacarés/crocodilos), por que tapar os olhos, amarrar as patas contra o tronco e prender a boca são cruciais antes de transporte?", options: ["Para eles não tentarem fugir correndo rápido demais", "São animais de explosão anaeróbia; lutam até exaustão lática ou infligem ferimentos mortais (rolamento)", "Apenas para que fiquem apresentáveis", "Pois podem vomitar se ficarem de olhos abertos"], answer: 1, explanation: "Os crocodilianos lutam usando energia anaeróbia, podendo atingir acidose lática fatal (pH sanguíneo afundando). A restrição total cessa o combate.", level: "dificil", species: "silvestre" },
+        { question: "Durante a contenção química ou sedação de um tatu para coleta de sangue, qual zoonose o médico deve ter mente em áreas endêmicas?", options: ["Leptospirose apenas", "Transmissão de Mycobacterium leprae (hanseníase)", "Toxoplasmose grave", "Raiva silvestre apenas"], answer: 1, explanation: "Tatus na natureza são conhecidos reservatórios ambientais viáveis para a bactéria causadora da lepra.", level: "dificil", species: "silvestre" }
+      ],
+      comuns_silvestre: [
+        { question: "Um jabuti é atendido no inverno, criado solto no piso gelado, com letargia, bolhas no nariz e respiração ruidosa de boca aberta. Suspeita:", options: ["Hiperadrenocorticismo", "Laminite aguda", "Síndrome do Trato Respiratório Superior (Pneumonia bacteriana ou micoplasma)", "Fratura de plastrão"], answer: 2, explanation: "Répteis dependem da temperatura ambiente (ectotérmicos). Frio crônico derruba o sistema imune e a umidade errada gera pneumonias clássicas.", level: "facil", species: "silvestre" },
+        { question: "Um papagaio idoso com dieta exclusiva de mistura barata de sementes de girassol apresenta espirros, placas brancas no céu da boca (coana) e penas feias.", options: ["Deficiência de Cálcio aguda", "Hipovitaminose A", "Hipervitaminose D", "Gota visceral"], answer: 1, explanation: "Sementes secas são muito pobres em Vitamina A. O déficit causa metaplasia epitelial, afetando vias aéreas (placas e tosse).", level: "facil", species: "silvestre" },
+        { question: "Qual a causa mais comum de distocia (ovo preso) em fêmeas de Iguanas mantidas sob luz artificial errada num terrário fechado?", options: ["Excesso crônico de vitamina C", "Vírus de Newcastle", "Hipocalcemia por privação de luz UVB e ambiente inadequado sem substrato para escavação", "Cálculos renais"], answer: 2, explanation: "A retenção folicular ou ovoposição presa requer cirurgia muitas vezes. A falta de UVB não sintetiza Vitamina D, não absorvendo cálcio e o útero não contrai.", level: "medio", species: "silvestre" },
+        { question: "Ave de estimação (calopsita) ou pinguim marinho mantido em cativeiro desenvolvendo lesões ulcerativas inchadas na sola dos pés devido a poleiros errados e higiene:", options: ["Malária aviária", "Poxvírus (bouba aviária)", "Pododermatite granulomatosa (Bumblefoot)", "Dermatofitose fúngica"], answer: 2, explanation: "O bumblefoot provém de traumas crônicos nos coxins dos pés evoluindo para infecção estafilocócica.", level: "medio", species: "silvestre" },
+        { question: "Um ferret castrado de 5 anos perde o pelo progressivamente de forma simétrica bilateral iniciando na base do rabo, apresentando abdome inchado, prurido e comportamento sexual anômalo.", options: ["Hiperadrenocorticismo (Doença da glândula adrenal de ferrets)", "Desnutrição por dieta sem taurina", "FIV e FeLV transferida de gato", "Alergia por picada de pulga severa"], answer: 0, explanation: "A doença adrenal no furão é extremamente comum devido a castração precoce com excesso de estímulo do eixo pituitário no tecido adrenal remanescente.", level: "medio", species: "silvestre" },
+        { question: "A deficiência nutricional causadora de enfraquecimento das paredes capilares, hemorragias articulares, gengivites e claudicação (Escorbuto) é comum em qual mamífero de pet?", options: ["Hamster", "Chinchila", "Porquinho-da-Índia (Cobaia)", "Coelho"], answer: 2, explanation: "Os porquinhos da índia não têm a enzima l-gulonolactona oxidase e não fabricam Vitamina C (assim como macacos e o homem).", level: "facil", species: "silvestre" },
+        { question: "Um gavião ou coruja resgatado é atendido sem mexer a asa direita após trauma (carro/cerca). Qual a técnica diagnóstica inicial imprescindível?", options: ["Ultrassonografia das penas", "Radiografia (RX) ortopédica para afastar luxações de coracoide ou fraturas", "Tomografia apenas", "Biópsia muscular"], answer: 1, explanation: "O diagnóstico da cinta escapular (coracoide, clavícula, escápula, úmero) e das asas nas aves é mandatório e requer um RX focado para definir se volta a voar.", level: "facil", species: "silvestre" }
+      ],
+      complexos_silvestre: [
+        { question: "Iguana-verde jovem alimentada com carne e alface crescendo no escuro. Ela surge mole (de borracha), tem contraturas e fraturas nas patas deitadas pelo próprio peso. Sem radiação solar natural:", options: ["Gota úrica visceral irreversível", "Doença Óssea Metabólica ou Osteodistrofia fibrosa (Hiperparatireoidismo secundário)", "Sarcocistose aguda", "Doença do corpúsculo de inclusão"], answer: 1, explanation: "Dietas hiperfosfatadas (carne) e falta total de luz UVB e cálcio geram a mais letal desmineralização óssea progressiva em répteis herbívoros.", level: "dificil", species: "silvestre" },
+        { question: "Papagaio (Amazona) traficado chega ao consultório após morte súbita de outro companheiro. Ele tem as fezes verde brilhante/amarelas uratos, muita letargia e dispneia (Pneumonia/Aerosaculite). Zoonose com potencial grave e tratamento tetraciclina:", options: ["Psitacose / Clamidiose (Chlamydia psittaci)", "Salmonella typhimurium avançada", "Aspergilose invasiva dos sacos aéreos", "Vírus do Nilo Ocidental (WNV)"], answer: 0, explanation: "A ornitose (febre dos papagaios) atinge os alvos hepático-esplênicos, causando o verde brilhante por uratos biliares e é zoonose notória.", level: "dificil", species: "silvestre" },
+        { question: "Após o abate por estresse agudo, uma arara que teve perda crônica das penas exibe fígado gigantesco (lipidose) ou massas inflamatórias dentro dos pulmões formando nódulos algodonosos brancos ou cinzas, sem cura em vida.", options: ["Candidíase de papo", "Colibacilose entérica", "Aspergilose respiratória (Aspergillus fumigatus)", "Varíola aviária sistêmica"], answer: 2, explanation: "A Aspergilose é muito letal em aves de ambientes quentes, úmidos e sujos ou aves imunossuprimidas, formando granulomas fúngicos obstrutivos.", level: "dificil", species: "silvestre" },
+        { question: "Um furão (ferret) com quase 7 anos apresenta focos de colapso repentino (olhar vago, ptialismo espumoso profuso, babando, claudicando nos pés de trás). O exame mostra níveis de Glicose abaixo de 50 mg/dL constantemente.", options: ["Linfoma mediastinal compressivo", "Toxina botulínica crônica", "Insulinoma (câncer de ilhotas do pâncreas)", "Doença inflamatória intestinal letal"], answer: 2, explanation: "Insulinoma secreta insulina erraticamente independente da comida, despencando a glicose do animal e induzindo crises hipoglicêmicas graves (ptialismo focal, convulsão, fraqueza posterior).", level: "dificil", species: "silvestre" },
+        { question: "Uma jiboia recém-adquirida num local com alta aglomeração começou a enrolar o próprio pescoço olhando para cima (stargazing - torcicolo fixo) e regugitou fezes pela boca. Pode ser um quadro fatal causado por arenavírus transmissível por ácaros chamado:", options: ["Disecdise generalizada (retenção de pele)", "Estomatite bolhosa idiopática", "Doença do Corpúsculo de Inclusão (IBD)", "Micobacteriose reptiliana"], answer: 2, explanation: "O IBD é uma doença viral letal em serpentes da família Boidae, gerando sintomas nervosos bizarros (mirar as estrelas) e regugitação crônica das refeições.", level: "dificil", species: "silvestre" }
+      ]
+    };
+
+    const state = {
+      activeCategory: null,
+      activeSpecies: null,
+      roundQuestions: [],
+      currentIndex: 0,
+      score: 0,
+      errorCount: 0,
+      answered: false,
+      history: [],
+      isInfinite: false,
+      isTraining: false,
+      errorsCount: 0,
+      usedIndices: new Set(),
+      currentLevel: "facil"
+    };
+
+    const appEls = {};
+
+    function shuffleArray(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function getCategoryLabel(key) {
+      const labels = {
+        anatomia: "Anatomia aplicada",
+        contencao: "Contenção",
+        comuns: "Casos comuns",
+        complexos: "Casos complexos",
+        treino: "Modo Treino",
+        mista: "Rodada mista",
+        infinito: "Desafio contínuo"
+      };
+      return labels[key] || key;
+    }
+
+    function getLevelLabel(level) {
+      const labels = { facil: "Fácil", medio: "Médio", dificil: "Difícil" };
+      return labels[level] || level;
+    }
+
+    function updateSubtitles() {
+      const names = {
+        pequenos: "Pequenos Animais",
+        grandes: "Grandes Animais",
+        equino: "Equinos",
+        silvestre: "Silvestres"
+      };
+      const speciesText = names[state.activeSpecies] || "Selecione a espécie";
+      
+      document.getElementById("anatomySubtitle").textContent = speciesText;
+      document.getElementById("contencaoSubtitle").textContent = speciesText;
+      document.getElementById("comunsSubtitle").textContent = speciesText;
+      document.getElementById("complexosSubtitle").textContent = speciesText;
+    }
+
+    function updateSpeciesButtons() {
+      document.querySelectorAll(".species-btn").forEach(btn => {
+        if (btn.dataset.species === state.activeSpecies) {
+          btn.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
+          btn.style.borderColor = "rgba(255, 255, 255, 0.3)";
+        } else {
+          btn.style.backgroundColor = "";
+          btn.style.borderColor = "";
+        }
+      });
+    }
+
+    function updateStats() {
+      appEls.scoreValue.textContent = String(state.score);
+      appEls.errorValue.textContent = String(state.errorCount);
+      appEls.progressValue.textContent = `${Math.min(state.currentIndex, state.roundQuestions.length)}/${state.roundQuestions.length}`;
+    }
+
+    function showSection(sectionName) {
+      appEls.welcomePanel.classList.add("hidden");
+      appEls.quizPanel.classList.add("hidden");
+      appEls.resultPanel.classList.add("hidden");
+      if (sectionName === "welcome") appEls.welcomePanel.classList.remove("hidden");
+      if (sectionName === "quiz") appEls.quizPanel.classList.remove("hidden");
+      if (sectionName === "result") appEls.resultPanel.classList.remove("hidden");
+    }
+
+    function startTrainingMode() {
+      if (!state.activeSpecies) {
+        alert("Por favor, selecione primeiro a espécie (Pequenos, Grandes, Equinos ou Silvestres).");
+        return;
+      }
+
+      state.activeCategory = "treino";
+      state.isTraining = true;
+      state.isInfinite = false;
+      state.currentLevel = "facil";
+      state.score = 0;
+      state.errorCount = 0;
+      state.currentIndex = 0;
+      state.answered = false;
+      state.history = [];
+      state.usedIndices = new Set();
+      state.roundQuestions = [];
+
+      loadTrainingQuestions();
+      updateStats();
+      renderQuestion();
+      showSection("quiz");
+    }
+
+    function loadTrainingQuestions() {
+      const speciesKey = "_" + state.activeSpecies;
+      let allQuestions = [];
+
+      const categories = ["anatomia", "contencao", "comuns", "complexos"];
+      for (const cat of categories) {
+        const key = cat + speciesKey;
+        if (quizData[key]) {
+          allQuestions = allQuestions.concat(quizData[key]);
+        }
+      }
+
+      const levelQuestions = allQuestions.filter(q => q.level === state.currentLevel);
+      // Pega no máximo 6 de cada nível
+      state.roundQuestions = shuffleArray(levelQuestions).slice(0, 6);
+    }
+
+    function startRound(category) {
+      if (category === "treino") {
+        startTrainingMode();
+        return;
+      }
+
+      if (!state.activeSpecies && category !== "mista") {
+        alert("Por favor, selecione primeiro a espécie para este tema.");
+        return;
+      }
+
+      state.activeCategory = category;
+      state.isInfinite = false;
+      state.isTraining = false;
+      state.errorsCount = 0;
+      state.usedIndices = new Set();
+      state.score = 0;
+      state.errorCount = 0;
+      state.currentIndex = 0;
+      state.answered = false;
+      state.history = [];
+
+      let pool = [];
+      
+      if (category === "mista") {
+        // Pega todos os arrays do objeto quizData
+        pool = [].concat(...Object.values(quizData)).map((item, index) => ({ ...item, mixedId: index }));
+      } else {
+        const dataKey = category + "_" + state.activeSpecies;
+        if (quizData[dataKey]) {
+          pool = quizData[dataKey].map((item, index) => ({ ...item, mixedId: index }));
+        }
+      }
+
+      // Se for rodada normal, exibe 6 perguntas embaralhadas (ou o máximo disponível)
+      state.roundQuestions = shuffleArray(pool).slice(0, 6);
+      
+      if (state.roundQuestions.length === 0) {
+         alert("Não há perguntas suficientes para esta categoria ainda.");
+         return;
+      }
+
+      updateStats();
+      renderQuestion();
+      showSection("quiz");
+    }
+
+    function startInfiniteRound() {
+      state.activeCategory = "infinito";
+      state.activeSpecies = null;
+      updateSpeciesButtons();
+      updateSubtitles();
+      
+      state.isInfinite = true;
+      state.isTraining = false;
+      state.errorsCount = 0;
+      state.score = 0;
+      state.errorCount = 0;
+      state.currentIndex = 0;
+      state.answered = false;
+      state.history = [];
+      state.roundQuestions = [];
+      state.usedIndices = new Set();
+      
+      generateNextInfiniteQuestion();
+      updateStats();
+      renderQuestion();
+      showSection("quiz");
+    }
+
+    function generateNextInfiniteQuestion() {
+      const allQuestions = [].concat(...Object.values(quizData));
+      
+      let availableIndices = [];
+      for (let i = 0; i < allQuestions.length; i++) {
+        if (!state.usedIndices.has(i)) {
+          availableIndices.push(i);
+        }
+      }
+      
+      if (availableIndices.length === 0) {
+        state.usedIndices.clear();
+        availableIndices = Array.from({length: allQuestions.length}, (_, i) => i);
+      }
+      
+      const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+      state.usedIndices.add(randomIndex);
+      state.roundQuestions.push(allQuestions[randomIndex]);
+    }
+
+    function renderQuestion() {
+      state.answered = false;
+      const item = state.roundQuestions[state.currentIndex];
+      if (!item) {
+        if (state.isTraining) {
+          advanceTrainingLevel();
+        } else {
+          renderResults();
+        }
+        return;
+      }
+
+      appEls.categoryPill.innerHTML = `<i data-lucide="book-open" class="h-3.5 w-3.5"></i><span>${getCategoryLabel(state.activeCategory)}</span>`;
+      appEls.questionText.textContent = item.question;
+      
+      const levelBadgeEl = document.getElementById("levelBadgeDisplay");
+      if (item.level) {
+        levelBadgeEl.textContent = getLevelLabel(item.level);
+        levelBadgeEl.className = `level-badge level-${item.level}`;
+      }
+      
+      if (state.isInfinite) {
+        appEls.questionCounter.textContent = `${state.currentIndex + 1} • ${state.errorsCount} erros`;
+      } else if (state.isTraining) {
+        appEls.questionCounter.textContent = `${state.currentIndex + 1}/${state.roundQuestions.length} • Nível: ${getLevelLabel(state.currentLevel)}`;
+      } else {
+        appEls.questionCounter.textContent = `${state.currentIndex + 1} de ${state.roundQuestions.length}`;
+      }
+      
+      appEls.answersGrid.innerHTML = "";
+      appEls.feedbackBox.classList.add("hidden");
+      appEls.nextButton.classList.add("hidden");
+      appEls.restartRoundButton.classList.add("hidden");
+
+      item.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-btn w-full rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition duration-200 hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20";
+        button.innerHTML = `
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold">${String.fromCharCode(65 + index)}</span>
+            <span class="leading-relaxed">${option}</span>
+          </div>
+        `;
+        button.addEventListener("click", () => answerQuestion(index, button));
+        appEls.answersGrid.appendChild(button);
+      });
+
+      updateStats();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function answerQuestion(selectedIndex, clickedButton) {
+      if (state.answered) return;
+      state.answered = true;
+
+      const item = state.roundQuestions[state.currentIndex];
+      const buttons = [...appEls.answersGrid.querySelectorAll(".answer-btn")];
+
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        btn.classList.remove("hover:bg-white/10");
+        if (index === item.answer) btn.classList.add("correct");
+        if (index === selectedIndex && selectedIndex !== item.answer) btn.classList.add("incorrect");
+      });
+
+      const isCorrect = selectedIndex === item.answer;
+      if (isCorrect) {
+        state.score += 1;
+      } else {
+        state.errorCount += 1;
+        if (state.isInfinite) state.errorsCount += 1;
+      }
+
+      state.history.push({
+        question: item.question,
+        selected: item.options[selectedIndex],
+        correct: item.options[item.answer],
+        explanation: item.explanation,
+        isCorrect,
+        level: item.level
+      });
+
+      appEls.feedbackBox.classList.remove("hidden");
+      appEls.feedbackTitle.textContent = isCorrect ? "Resposta correta!" : "Não foi dessa vez.";
+      appEls.feedbackText.textContent = item.explanation;
+      appEls.feedbackBox.className = isCorrect
+        ? "mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-50"
+        : "mt-6 rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-rose-50";
+
+      if (state.isInfinite && state.errorsCount >= 5) {
+        appEls.nextButton.textContent = "Ver resultado final";
+        appEls.nextButton.classList.remove("hidden");
+      } else if (state.currentIndex < state.roundQuestions.length - 1) {
+        appEls.nextButton.classList.remove("hidden");
+        appEls.nextButton.textContent = "Próxima pergunta";
+      } else {
+        appEls.nextButton.textContent = state.isInfinite ? "Próxima pergunta" : (state.isTraining && state.currentLevel !== 'dificil' ? "Avançar Nível" : "Ver resultado");
+        appEls.nextButton.classList.remove("hidden");
+      }
+
+      updateStats();
+    }
+
+    function advanceTrainingLevel() {
+      if (state.currentLevel === "facil") {
+        state.currentLevel = "medio";
+        state.currentIndex = 0;
+        state.roundQuestions = [];
+        state.answered = false;
+        loadTrainingQuestions();
+        if(state.roundQuestions.length > 0) {
+          renderQuestion();
+        } else {
+           advanceTrainingLevel(); // Pula nível se estiver vazio (fallback de segurança)
+        }
+      } else if (state.currentLevel === "medio") {
+        state.currentLevel = "dificil";
+        state.currentIndex = 0;
+        state.roundQuestions = [];
+        state.answered = false;
+        loadTrainingQuestions();
+        if(state.roundQuestions.length > 0) {
+          renderQuestion();
+        } else {
+           renderResults(); 
+        }
+      } else {
+        renderResults();
+      }
+    }
+
+    function nextQuestion() {
+      if (state.isTraining) {
+        if (state.currentIndex < state.roundQuestions.length - 1) {
+          state.currentIndex += 1;
+          renderQuestion();
+        } else {
+          advanceTrainingLevel();
+        }
+      } else if (state.isInfinite) {
+        if (state.errorsCount >= 5) {
+          renderResults();
+        } else {
+          state.currentIndex += 1;
+          generateNextInfiniteQuestion();
+          renderQuestion();
+        }
+      } else {
+        if (state.currentIndex < state.roundQuestions.length - 1) {
+          state.currentIndex += 1;
+          renderQuestion();
+        } else {
+          renderResults();
+        }
+      }
+    }
+
+    function renderResults() {
+      showSection("result");
+      
+      if (state.isTraining) {
+        appEls.finalScore.textContent = `${state.score}`;
+        const nomes = { pequenos: "Pequenos Animais", grandes: "Grandes Animais", equino: "Equinos", silvestre: "Silvestres" };
+        appEls.resultSummary.textContent = `Parabéns! Você completou o Modo Treino de ${nomes[state.activeSpecies]}. Você aprendeu progressivamente. Acertos: ${state.score}, Erros: ${state.errorCount}.`;
+      } else if (state.isInfinite) {
+        appEls.finalScore.textContent = `${state.score}/${state.currentIndex}`;
+        const message = `Parabéns pela resistência! Você chegou ao limite de 5 erros após ${state.currentIndex} perguntas completadas.`;
+        appEls.resultSummary.textContent = message;
+      } else {
+        appEls.finalScore.textContent = `${state.score}/${state.roundQuestions.length}`;
+        let message = "Bom começo! Vale revisar os pontos com mais atenção.";
+        const ratio = state.score / state.roundQuestions.length;
+        if (ratio === 1) message = "Excelente! Você fechou a rodada com aproveitamento máximo.";
+        else if (ratio >= 0.75) message = "Muito bem! Você mostrou ótimo domínio do tema.";
+        else if (ratio >= 0.5) message = "Bom desempenho! Mais uma rodada e você fixa ainda mais.";
+        appEls.resultSummary.textContent = `${message} Tema jogado: ${getCategoryLabel(state.activeCategory)}.`;
+      }
+
+      appEls.reviewList.innerHTML = "";
+      appEls.reviewList.classList.add("hidden");
+
+      state.history.forEach((entry, index) => {
+        const card = document.createElement("article");
+        card.className = "rounded-2xl border border-white/10 bg-black/10 p-4 text-white";
+        const levelBadge = entry.level ? `<span class="level-badge level-${entry.level}">${getLevelLabel(entry.level)}</span>` : "";
+        card.innerHTML = `
+          <p class="text-xs uppercase tracking-[0.22em] ${entry.isCorrect ? 'text-emerald-300' : 'text-rose-300'}">
+            ${entry.isCorrect ? 'Correta' : 'Incorreta'} • ${index + 1} ${levelBadge}
+          </p>
+          <h3 class="mt-2 text-lg font-semibold">${entry.question}</h3>
+          <p class="mt-3 text-sm text-white/70"><strong class="text-white/90">Sua resposta:</strong> ${entry.selected}</p>
+          <p class="mt-1 text-sm text-white/70"><strong class="text-white/90">Resposta certa:</strong> ${entry.correct}</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/75">${entry.explanation}</p>
+        `;
+        appEls.reviewList.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function applyTheme(config) {
+      const bg = config.background_color || defaultConfig.background_color;
+      const surface = config.surface_color || defaultConfig.surface_color;
+      const text = config.text_color || defaultConfig.text_color;
+      const primary = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondary = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const font = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      document.documentElement.style.setProperty("--bg", bg);
+      document.documentElement.style.setProperty("--surface", surface);
+      document.documentElement.style.setProperty("--text", text);
+      document.documentElement.style.setProperty("--primary", primary);
+      document.documentElement.style.setProperty("--secondary", secondary);
+
+      document.body.style.background = `
+        radial-gradient(circle at 15% 20%, ${hexToRgba(primary, 0.18)}, transparent 22%),
+        radial-gradient(circle at 85% 10%, ${hexToRgba(secondary, 0.22)}, transparent 20%),
+        radial-gradient(circle at 50% 100%, rgba(233,223,199,0.08), transparent 25%),
+        linear-gradient(180deg, ${bg} 0%, ${mixHex(bg, "#ffffff", 0.08)} 48%, ${bg} 100%)
+      `;
+
+      document.querySelectorAll(".title-font").forEach(el => {
+        el.style.fontFamily = `${font}, "Cormorant Garamond", serif`;
+      });
+
+      document.body.style.fontSize = `${baseSize}px`;
+      appEls.mainTitle.style.fontSize = `${baseSize * 2.9}px`;
+      appEls.subtitleText.style.fontSize = `${baseSize * 1}px`;
+      appEls.startButton.style.fontSize = `${baseSize * 0.95}px`;
+
+      appEls.startButton.style.backgroundColor = primary;
+      appEls.nextButton.style.backgroundColor = primary;
+      appEls.playAgainButton.style.backgroundColor = primary;
+      appEls.brandBubble.style.backgroundColor = secondary;
+      appEls.mixButton.style.borderColor = secondary;
+
+      appEls.resultPanel.querySelector("#finalScore").style.color = text;
+      appEls.gameSection.querySelectorAll(".rounded-\\[24px\\]").forEach(el => {
+        el.style.backgroundColor = surface;
+        el.style.color = text;
+      });
+    }
+
+    function hexToRgba(hex, alpha) {
+      const value = hex.replace("#", "");
+      const bigint = parseInt(value.length === 3
+        ? value.split("").map(ch => ch + ch).join("")
+        : value, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function mixHex(color1, color2, weight) {
+      const c1 = parseInt(color1.slice(1), 16);
+      const c2 = parseInt(color2.slice(1), 16);
+      const r1 = (c1 >> 16) & 255, g1 = (c1 >> 8) & 255, b1 = c1 & 255;
+      const r2 = (c2 >> 16) & 255, g2 = (c2 >> 8) & 255, b2 = c2 & 255;
+      const r = Math.round(r1 * (1 - weight) + r2 * weight);
+      const g = Math.round(g1 * (1 - weight) + g2 * weight);
+      const b = Math.round(b1 * (1 - weight) + b2 * weight);
+      return `#${[r, g, b].map(v => v.toString(16).padStart(2, "0")).join("")}`;
+    }
+
+    function initElements() {
+      appEls.mainTitle = document.getElementById("mainTitle");
+      appEls.subtitleText = document.getElementById("subtitleText");
+      appEls.startButton = document.getElementById("startButton");
+      appEls.startButtonLabel = document.getElementById("startButtonLabel");
+      appEls.brandBubble = document.getElementById("brandBubble");
+      appEls.introCard = document.getElementById("introCard");
+      appEls.gameSection = document.getElementById("gameSection");
+      appEls.scoreValue = document.getElementById("scoreValue");
+      appEls.errorValue = document.getElementById("errorValue");
+      appEls.progressValue = document.getElementById("progressValue");
+      appEls.welcomePanel = document.getElementById("welcomePanel");
+      appEls.quizPanel = document.getElementById("quizPanel");
+      appEls.resultPanel = document.getElementById("resultPanel");
+      appEls.categoryPill = document.getElementById("categoryPill");
+      appEls.questionText = document.getElementById("questionText");
+      appEls.questionCounter = document.getElementById("questionCounter");
+      appEls.answersGrid = document.getElementById("answersGrid");
+      appEls.feedbackBox = document.getElementById("feedbackBox");
+      appEls.feedbackTitle = document.getElementById("feedbackTitle");
+      appEls.feedbackText = document.getElementById("feedbackText");
+      appEls.nextButton = document.getElementById("nextButton");
+      appEls.restartRoundButton = document.getElementById("restartRoundButton");
+      appEls.finalScore = document.getElementById("finalScore");
+      appEls.resultSummary = document.getElementById("resultSummary");
+      appEls.playAgainButton = document.getElementById("playAgainButton");
+      appEls.backCategoriesButton = document.getElementById("backCategoriesButton");
+      appEls.reviewButton = document.getElementById("reviewButton");
+      appEls.reviewList = document.getElementById("reviewList");
+      appEls.mixButton = document.getElementById("mixButton");
+      appEls.infiniteButton = document.getElementById("infiniteButton");
+    }
+
+    function bindEvents() {
+      appEls.startButton.addEventListener("click", () => {
+        appEls.introCard.classList.add("hidden");
+        appEls.gameSection.classList.remove("hidden");
+        showSection("welcome");
+      });
+
+      document.querySelectorAll(".species-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          state.activeSpecies = button.dataset.species;
+          updateSpeciesButtons();
+          updateSubtitles();
+        });
+      });
+
+      document.querySelectorAll(".category-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          startRound(button.dataset.category);
+        });
+      });
+
+      appEls.mixButton.addEventListener("click", () => startRound("mista"));
+      appEls.infiniteButton.addEventListener("click", startInfiniteRound);
+      appEls.nextButton.addEventListener("click", nextQuestion);
+
+      appEls.restartRoundButton.addEventListener("click", () => {
+        if (state.activeCategory) startRound(state.activeCategory);
+      });
+
+      appEls.playAgainButton.addEventListener("click", () => {
+        if (state.isInfinite) {
+          startInfiniteRound();
+        } else if (state.isTraining) {
+          startTrainingMode();
+        } else if (state.activeCategory) {
+          startRound(state.activeCategory);
+        }
+      });
+
+      appEls.backCategoriesButton.addEventListener("click", () => {
+        showSection("welcome");
+      });
+
+      appEls.reviewButton.addEventListener("click", () => {
+        appEls.reviewList.classList.toggle("hidden");
+      });
+    }
+
+    function initEditableFeatures() {
+      if (!window.elementSdk) {
+        applyTheme(defaultConfig);
+        appEls.mainTitle.textContent = defaultConfig.main_title;
+        appEls.subtitleText.textContent = defaultConfig.subtitle_text;
+        appEls.startButtonLabel.textContent = defaultConfig.start_button_text;
+        return;
+      }
+
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const fullConfig = { ...defaultConfig, ...config };
+          appEls.mainTitle.textContent = fullConfig.main_title;
+          appEls.subtitleText.textContent = fullConfig.subtitle_text;
+          appEls.startButtonLabel.textContent = fullConfig.start_button_text;
+          applyTheme(fullConfig);
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => window.elementSdk.setConfig({ background_color: value })
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => window.elementSdk.setConfig({ surface_color: value })
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => window.elementSdk.setConfig({ text_color: value })
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => window.elementSdk.setConfig({ primary_action_color: value })
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => window.elementSdk.setConfig({ secondary_action_color: value })
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => window.elementSdk.setConfig({ font_family: value })
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => window.elementSdk.setConfig({ font_size: value })
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["subtitle_text", config.subtitle_text || defaultConfig.subtitle_text],
+          ["start_button_text", config.start_button_text || defaultConfig.start_button_text]
+        ])
+      });
+    }
+
+    initElements();
+    bindEvents();
+    initEditableFeatures();
+    updateStats();
+
+    function renderLucideIcons() {
+      if (window.lucide && window.lucide.createIcons) {
+        try {
+          window.lucide.createIcons();
+        } catch (e) {
+          console.warn("Erro ao carregar ícones Lucide:", e);
+        }
+      }
+    }
+
+    renderLucideIcons();
+    
+    const observer = new MutationObserver((mutations) => {
+      let hasNewIcons = false;
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          hasNewIcons = true;
+        }
+      });
+      if (hasNewIcons) {
+        setTimeout(renderLucideIcons, 50);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  </script>
+</body>
+</html>
