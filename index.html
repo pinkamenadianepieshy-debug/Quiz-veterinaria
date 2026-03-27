@@ -101,7 +101,7 @@
     .answer-btn.incorrect { outline: 3px solid rgba(239,68,68,0.38); }
     .glass-edge { box-shadow: 0 10px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08); }
     .badge { backdrop-filter: blur(10px); }
-    .level-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+    .level-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
     .level-facil { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
     .level-medio { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
     .level-dificil { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
@@ -110,87 +110,91 @@
 <body class="h-full">
   <div id="app" class="relative h-full w-full overflow-auto">
     <div class="grain"></div>
-    <header class="relative z-10 px-5 pt-6 pb-3 sm:px-8">
+    <header class="relative z-10 px-4 pt-5 pb-3 sm:px-8">
       <div class="mx-auto max-w-6xl">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 badge">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full" id="brandBubble"> 
-              <i data-lucide="stethoscope" class="h-5 w-5"></i> 
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 sm:px-4 badge">
+            <span class="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full" id="brandBubble"> 
+              <i data-lucide="stethoscope" class="h-4 w-4 sm:h-5 sm:w-5"></i> 
             </span>
             <div>
-              <p class="text-xs uppercase tracking-[0.28em] text-white/60">Jogo de estudo</p>
-              <p class="text-sm font-semibold text-white/90">Clínica Veterinária Completa</p>
+              <p class="text-[10px] sm:text-xs uppercase tracking-[0.28em] text-white/60">Jogo de estudo</p>
+              <p class="text-xs sm:text-sm font-semibold text-white/90">Clínica Veterinária</p>
             </div>
           </div>
-          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 badge">
-            <i data-lucide="brain" class="h-4 w-4"></i> <span>Treino com feedback imediato</span>
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs sm:text-sm text-white/80 badge">
+            <i data-lucide="brain" class="h-3.5 w-3.5 sm:h-4 sm:w-4"></i> <span class="hidden sm:inline">Treino com feedback imediato</span><span class="sm:hidden">Treino Rápido</span>
           </div>
         </div>
       </div>
     </header>
-    <main class="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 pb-8 sm:px-8">
-      <section id="introCard" class="glass-edge fade-up overflow-hidden rounded-[28px] border border-white/10 bg-white/6">
+    
+    <main class="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 sm:px-8">
+      <section id="introCard" class="glass-edge fade-up overflow-hidden rounded-[24px] sm:rounded-[28px] border border-white/10 bg-white/6">
         <div class="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-          <div class="p-6 sm:p-8 lg:p-10">
-            <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/70">
+          <div class="p-5 sm:p-8 lg:p-10">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-[10px] sm:text-xs uppercase tracking-[0.25em] text-white/70">
               <i data-lucide="leaf" class="h-3.5 w-3.5"></i> anatomia • contenção • clínica
             </div>
-            <h1 id="mainTitle" class="title-font text-5xl font-semibold leading-none text-[#f7f2e7] sm:text-6xl">Quiz Veterinário Completo</h1>
-            <p id="subtitleText" class="mt-4 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">Escolha uma área e responda perguntas com foco prático: casos clínicos comuns, complexos, anatomia aplicada e contenção de diversas espécies.</p>
-            <div class="mt-7 grid gap-3 sm:grid-cols-2">
-              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
-                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
-                  <i data-lucide="dog" class="h-5 w-5"></i>
+            <h1 id="mainTitle" class="title-font text-4xl sm:text-5xl lg:text-6xl font-semibold leading-none text-[#f7f2e7]">Quiz Veterinário Completo</h1>
+            <p id="subtitleText" class="mt-4 max-w-2xl text-sm sm:text-base lg:text-lg leading-relaxed text-white/78">Escolha uma área e responda perguntas com foco prático: casos clínicos comuns, complexos, anatomia aplicada e contenção de diversas espécies.</p>
+            
+            <div class="mt-6 sm:mt-7 grid gap-3 grid-cols-1 sm:grid-cols-2">
+              <article class="rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
+                <div class="mb-2 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-white/10 text-white">
+                  <i data-lucide="dog" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                 </div>
-                <h2 class="text-lg font-semibold text-white">Pequenos Animais</h2>
-                <p class="mt-1 text-sm leading-relaxed text-white/70">Rotina clínica de cães e gatos, urgências, fisiologia e doenças infecciosas comuns.</p>
+                <h2 class="text-base sm:text-lg font-semibold text-white">Pequenos Animais</h2>
+                <p class="mt-1 text-xs sm:text-sm leading-relaxed text-white/70">Rotina clínica de cães e gatos, urgências e fisiologia.</p>
               </article>
-              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
-                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
-                  <i data-lucide="tractor" class="h-5 w-5"></i>
+              <article class="rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay">
+                <div class="mb-2 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-white/10 text-white">
+                  <i data-lucide="tractor" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                 </div>
-                <h2 class="text-lg font-semibold text-white">Grandes Animais</h2>
-                <p class="mt-1 text-sm leading-relaxed text-white/70">Bovinos, ovinos e caprinos. Manejo de rebanho, distúrbios metabólicos e anatomia de ruminantes.</p>
+                <h2 class="text-base sm:text-lg font-semibold text-white">Grandes Animais</h2>
+                <p class="mt-1 text-xs sm:text-sm leading-relaxed text-white/70">Bovinos, ovinos e caprinos. Distúrbios e anatomia de ruminantes.</p>
               </article>
-              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
-                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
-                  <i data-lucide="horse" class="h-5 w-5"></i>
+              <article class="rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
+                <div class="mb-2 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-white/10 text-white">
+                  <i data-lucide="horse" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                 </div>
-                <h2 class="text-lg font-semibold text-white">Equinos</h2>
-                <p class="mt-1 text-sm leading-relaxed text-white/70">Síndrome cólica, claudicação, vias aéreas, contenção física e avaliação biomecânica.</p>
+                <h2 class="text-base sm:text-lg font-semibold text-white">Equinos</h2>
+                <p class="mt-1 text-xs sm:text-sm leading-relaxed text-white/70">Síndrome cólica, claudicação, vias aéreas e contenção física.</p>
               </article>
-              <article class="rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
-                <div class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
-                  <i data-lucide="bird" class="h-5 w-5"></i>
+              <article class="rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 fade-up-delay-2">
+                <div class="mb-2 inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-white/10 text-white">
+                  <i data-lucide="bird" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                 </div>
-                <h2 class="text-lg font-semibold text-white">Silvestres</h2>
-                <p class="mt-1 text-sm leading-relaxed text-white/70">Aves, répteis e exóticos. Estresse de contenção, doenças metabólicas e parâmetros vitais.</p>
+                <h2 class="text-base sm:text-lg font-semibold text-white">Silvestres</h2>
+                <p class="mt-1 text-xs sm:text-sm leading-relaxed text-white/70">Aves, répteis e exóticos. Estresse de contenção e doenças.</p>
               </article>
             </div>
-            <button id="startButton" class="mt-8 inline-flex items-center gap-3 rounded-full px-6 py-3 text-base font-bold text-white transition duration-200 focus:outline-none focus:ring-4 focus:ring-white/30"> 
+            
+            <button id="startButton" class="mt-6 sm:mt-8 w-full sm:w-auto inline-flex justify-center items-center gap-3 rounded-full px-6 py-4 sm:py-3 text-base font-bold text-white transition duration-200 focus:outline-none focus:ring-4 focus:ring-white/30"> 
               <i data-lucide="play" class="h-5 w-5"></i> 
               <span id="startButtonLabel">Começar jogo</span> 
             </button>
           </div>
+          
           <aside class="relative overflow-hidden border-t border-white/10 bg-[#eadfc7] text-[#1d2a22] lg:border-l lg:border-t-0">
             <div class="absolute inset-0 opacity-70" style="background:
                   radial-gradient(circle at 25% 25%, rgba(176,90,43,0.18), transparent 24%),
                   radial-gradient(circle at 75% 75%, rgba(73,106,82,0.18), transparent 24%),
                   linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08));"></div>
-            <div class="relative p-6 sm:p-8 lg:p-10">
-              <h2 class="title-font text-3xl font-semibold">Como funciona</h2>
-              <div class="mt-5 space-y-4 text-sm leading-relaxed">
-                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
-                  <p class="font-semibold">1. Escolha a espécie</p>
-                  <p class="mt-1 text-black/70">Pequenos, Grandes, Equinos ou Silvestres.</p>
+            <div class="relative p-5 sm:p-8 lg:p-10">
+              <h2 class="title-font text-2xl sm:text-3xl font-semibold">Como funciona</h2>
+              <div class="mt-4 sm:mt-5 space-y-3 sm:space-y-4 text-sm leading-relaxed">
+                <div class="rounded-xl sm:rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold text-[#1d2a22]">1. Escolha a espécie</p>
+                  <p class="mt-0.5 text-black/70">Pequenos, Grandes, Equinos ou Silvestres.</p>
                 </div>
-                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
-                  <p class="font-semibold">2. Escolha o tema</p>
-                  <p class="mt-1 text-black/70">Anatomia, contenção, casos comuns, complexos ou Treino.</p>
+                <div class="rounded-xl sm:rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold text-[#1d2a22]">2. Escolha o tema</p>
+                  <p class="mt-0.5 text-black/70">Anatomia, contenção, casos comuns, complexos ou Treino.</p>
                 </div>
-                <div class="rounded-2xl border border-black/10 bg-white/40 p-4">
-                  <p class="font-semibold">3. Responda e aprenda</p>
-                  <p class="mt-1 text-black/70">Cada resposta traz a justificativa logo em seguida para você fixar o conteúdo.</p>
+                <div class="rounded-xl sm:rounded-2xl border border-black/10 bg-white/40 p-4">
+                  <p class="font-semibold text-[#1d2a22]">3. Responda e aprenda</p>
+                  <p class="mt-0.5 text-black/70">Cada resposta traz a justificativa logo em seguida para você fixar o conteúdo.</p>
                 </div>
               </div>
             </div>
@@ -198,168 +202,184 @@
         </div>
       </section>
       
+      <!-- Layout flex-col garante que no mobile a barra lateral fique acima quando em Menu, e flex-col-reverse inverte quando no Quiz -->
       <section id="gameSection" class="hidden">
-        <div class="grid gap-6 lg:grid-cols-[300px_1fr]">
-          <aside class="glass-edge fade-up rounded-[26px] border border-white/10 bg-white/6 p-5">
-            <h2 class="title-font text-3xl font-semibold text-[#f7f2e7]">Temas</h2>
-            <p class="mt-2 text-sm text-white/70">Escolha os blocos para jogar.</p>
-            <div class="mb-4 rounded-2xl border border-white/10 bg-black/10 p-4 mt-4">
-              <p class="text-xs uppercase tracking-[0.22em] text-white/50">1. Escolha a espécie</p>
-              <div class="mt-3 grid grid-cols-2 gap-2">
-                <button data-species="pequenos" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
-                  <i data-lucide="dog" class="h-5 w-5"></i> Pequenos 
+        <div id="gameContainer" class="flex flex-col lg:grid lg:grid-cols-[300px_1fr] gap-5 sm:gap-6">
+          <aside class="glass-edge fade-up rounded-[24px] sm:rounded-[26px] border border-white/10 bg-white/6 p-4 sm:p-5">
+            <h2 class="title-font text-2xl sm:text-3xl font-semibold text-[#f7f2e7]">Temas</h2>
+            <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-white/70">Escolha os blocos para jogar.</p>
+            
+            <div class="mb-4 rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 mt-4">
+              <p class="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/50">1. Escolha a espécie</p>
+              <div class="mt-2 sm:mt-3 grid grid-cols-2 gap-2">
+                <button data-species="pequenos" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1.5"> 
+                  <i data-lucide="dog" class="h-4 w-4 sm:h-5 sm:w-5"></i> Pequenos 
                 </button> 
-                <button data-species="grandes" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
-                  <i data-lucide="tractor" class="h-5 w-5"></i> Grandes 
+                <button data-species="grandes" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1.5"> 
+                  <i data-lucide="tractor" class="h-4 w-4 sm:h-5 sm:w-5"></i> Grandes 
                 </button>
-                <button data-species="equino" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
-                  <i data-lucide="horse" class="h-5 w-5"></i> Equinos 
+                <button data-species="equino" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1.5"> 
+                  <i data-lucide="horse" class="h-4 w-4 sm:h-5 sm:w-5"></i> Equinos 
                 </button> 
-                <button data-species="silvestre" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1"> 
-                  <i data-lucide="bird" class="h-5 w-5"></i> Silvestres 
+                <button data-species="silvestre" class="species-btn rounded-xl border border-white/10 bg-white/5 px-2 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-white/10 flex flex-col items-center justify-center text-center gap-1.5"> 
+                  <i data-lucide="bird" class="h-4 w-4 sm:h-5 sm:w-5"></i> Silvestres 
                 </button>
               </div>
             </div>
-            <nav class="mt-5 grid gap-3" aria-label="Categorias do quiz">
-              <p class="text-xs uppercase tracking-[0.22em] text-white/50">2. Escolha o tema</p>
-              <button data-category="anatomia" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+            
+            <nav class="mt-4 sm:mt-5 grid gap-2 sm:gap-3" aria-label="Categorias do quiz">
+              <p class="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/50">2. Escolha o tema</p>
+              <button data-category="anatomia" class="category-btn rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="bone" class="h-5 w-5"></i>
+                  <i data-lucide="bone" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Anatomia aplicada</div>
-                    <div class="text-sm text-white/65" id="anatomySubtitle">Selecione a espécie</div>
+                    <div class="text-sm sm:text-base font-semibold">Anatomia aplicada</div>
+                    <div class="text-xs sm:text-sm text-white/65" id="anatomySubtitle">Selecione a espécie</div>
                   </div>
                 </div>
               </button> 
-              <button data-category="contencao" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <button data-category="contencao" class="category-btn rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="shield" class="h-5 w-5"></i>
+                  <i data-lucide="shield" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Contenção</div>
-                    <div class="text-sm text-white/65" id="contencaoSubtitle">Selecione a espécie</div>
+                    <div class="text-sm sm:text-base font-semibold">Contenção</div>
+                    <div class="text-xs sm:text-sm text-white/65" id="contencaoSubtitle">Selecione a espécie</div>
                   </div>
                 </div>
               </button> 
-              <button data-category="comuns" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <button data-category="comuns" class="category-btn rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="clipboard-plus" class="h-5 w-5"></i>
+                  <i data-lucide="clipboard-plus" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Casos comuns</div>
-                    <div class="text-sm text-white/65" id="comunsSubtitle">Selecione a espécie</div>
+                    <div class="text-sm sm:text-base font-semibold">Casos comuns</div>
+                    <div class="text-xs sm:text-sm text-white/65" id="comunsSubtitle">Selecione a espécie</div>
                   </div>
                 </div>
               </button> 
-              <button data-category="complexos" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <button data-category="complexos" class="category-btn rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="flask-conical" class="h-5 w-5"></i>
+                  <i data-lucide="flask-conical" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Casos complexos</div>
-                    <div class="text-sm text-white/65" id="complexosSubtitle">Selecione a espécie</div>
+                    <div class="text-sm sm:text-base font-semibold">Casos complexos</div>
+                    <div class="text-xs sm:text-sm text-white/65" id="complexosSubtitle">Selecione a espécie</div>
                   </div>
                 </div>
               </button> 
-              <button data-category="treino" class="category-btn rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <button data-category="treino" class="category-btn rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="graduation-cap" class="h-5 w-5"></i>
+                  <i data-lucide="graduation-cap" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Modo Treino</div>
-                    <div class="text-sm text-white/65" id="treinoSubtitle">Fácil → Médio → Difícil</div>
+                    <div class="text-sm sm:text-base font-semibold">Modo Treino</div>
+                    <div class="text-xs sm:text-sm text-white/65" id="treinoSubtitle">Fácil → Médio → Difícil</div>
                   </div>
                 </div>
               </button> 
-              <hr class="border-white/10 my-2">
-              <button id="mixButton" class="rounded-2xl border border-dashed border-white/20 bg-white/5 p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <hr class="border-white/10 my-1 sm:my-2">
+              <button id="mixButton" class="rounded-xl sm:rounded-2xl border border-dashed border-white/20 bg-white/5 p-3 sm:p-4 text-left text-white transition hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="shuffle" class="h-5 w-5"></i>
+                  <i data-lucide="shuffle" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Rodada mista</div>
-                    <div class="text-sm text-white/65">Todas as espécies</div>
+                    <div class="text-sm sm:text-base font-semibold">Rodada mista</div>
+                    <div class="text-xs sm:text-sm text-white/65">Todas as espécies</div>
                   </div>
                 </div>
               </button> 
-              <button id="infiniteButton" class="rounded-2xl border border-white/15 bg-white/10 p-4 text-left text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20">
+              <button id="infiniteButton" class="rounded-xl sm:rounded-2xl border border-white/15 bg-white/10 p-3 sm:p-4 text-left text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20">
                 <div class="flex items-center gap-3">
-                  <i data-lucide="zap" class="h-5 w-5"></i>
+                  <i data-lucide="zap" class="h-4 w-4 sm:h-5 sm:w-5"></i>
                   <div>
-                    <div class="font-semibold">Desafio contínuo</div>
-                    <div class="text-sm text-white/65">Até errar 5 questões</div>
+                    <div class="text-sm sm:text-base font-semibold">Desafio contínuo</div>
+                    <div class="text-xs sm:text-sm text-white/65">Até errar 5 questões</div>
                   </div>
                 </div>
               </button>
             </nav>
-            <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
-              <p class="text-xs uppercase tracking-[0.22em] text-white/50">Desempenho atual</p>
-              <div class="mt-3 flex items-end justify-between gap-4">
+            
+            <div class="mt-5 sm:mt-6 rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4">
+              <p class="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/50">Desempenho atual</p>
+              <div class="mt-2 sm:mt-3 flex items-end justify-between gap-3">
                 <div>
-                  <p id="scoreValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0</p>
-                  <p class="text-sm text-white/65">acertos</p>
+                  <p id="scoreValue" class="title-font text-3xl sm:text-4xl font-semibold text-[#f7f2e7]">0</p>
+                  <p class="text-[11px] sm:text-sm text-white/65">acertos</p>
                 </div>
                 <div>
-                  <p id="errorValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0</p>
-                  <p class="text-sm text-white/65">erros</p>
+                  <p id="errorValue" class="title-font text-3xl sm:text-4xl font-semibold text-[#f7f2e7]">0</p>
+                  <p class="text-[11px] sm:text-sm text-white/65">erros</p>
                 </div>
                 <div>
-                  <p id="progressValue" class="title-font text-4xl font-semibold text-[#f7f2e7]">0/0</p>
-                  <p class="text-sm text-white/65">respondidas</p>
+                  <p id="progressValue" class="title-font text-3xl sm:text-4xl font-semibold text-[#f7f2e7]">0/0</p>
+                  <p class="text-[11px] sm:text-sm text-white/65">resp.</p>
                 </div>
               </div>
             </div>
           </aside>
           
-          <section class="fade-up-delay">
-            <div id="welcomePanel" class="glass-edge rounded-[26px] border border-white/10 bg-white/6 p-6 sm:p-8">
-              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/60">
+          <section class="fade-up-delay flex-1">
+            <div id="welcomePanel" class="glass-edge rounded-[24px] sm:rounded-[26px] border border-white/10 bg-white/6 p-5 sm:p-8">
+              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/60">
                 <i data-lucide="sparkles" class="h-3.5 w-3.5"></i> pronto para estudar
               </div>
-              <h2 class="title-font mt-4 text-4xl font-semibold text-[#f7f2e7]">Selecione uma espécie e um tema</h2>
-              <p class="mt-3 max-w-2xl text-white/72">O jogo traz perguntas com quatro alternativas e uma explicação curta após cada resposta. Ideal para revisar rapidamente e fixar os macetes clínicos e anatômicos essenciais.</p>
+              <h2 class="title-font mt-3 sm:mt-4 text-3xl sm:text-4xl font-semibold text-[#f7f2e7]">Selecione uma espécie e um tema</h2>
+              <p class="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-white/72 leading-relaxed">No telemóvel, basta selecionar as opções abaixo. O jogo traz perguntas com alternativas e explicação prática logo após a resposta.</p>
             </div>
             
-            <div id="quizPanel" class="glass-edge hidden rounded-[26px] border border-white/10 bg-white/6 p-5 sm:p-8">
+            <div id="quizPanel" class="glass-edge hidden rounded-[24px] sm:rounded-[26px] border border-white/10 bg-white/6 p-4 sm:p-8">
               <div class="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <div id="categoryPill" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/65"></div>
-                  <h2 id="questionText" class="title-font mt-4 text-3xl font-semibold text-[#f7f2e7] sm:text-4xl"></h2>
+                <div class="w-full sm:w-auto flex-1">
+                  <div id="categoryPill" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/65"></div>
+                  <h2 id="questionText" class="title-font mt-3 sm:mt-4 text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#f7f2e7] leading-tight"></h2>
                 </div>
-                <div class="flex flex-col gap-2">
-                  <div id="levelBadgeDisplay" class="level-badge"></div>
-                  <div class="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-right">
-                    <p class="text-xs uppercase tracking-[0.22em] text-white/50">Pergunta</p>
-                    <p id="questionCounter" class="text-lg font-semibold text-white"></p>
+                <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto justify-between sm:justify-start items-end">
+                  <div id="levelBadgeDisplay" class="level-badge mt-1 sm:mt-0"></div>
+                  <!-- Painel de status compacto para mobile embutido no header -->
+                  <div class="rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 px-3 sm:px-4 py-2 sm:py-3 flex gap-3 sm:block divide-x divide-white/10 sm:divide-none text-right">
+                    <div>
+                      <p class="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-white/50">Pergunta</p>
+                      <p id="questionCounter" class="text-sm sm:text-lg font-semibold text-white"></p>
+                    </div>
+                    <div class="pl-3 sm:hidden text-left">
+                      <p class="text-[9px] uppercase tracking-[0.2em] text-white/50">Acertos</p>
+                      <p id="mobileScore" class="text-sm font-semibold text-[#86efac]">0</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div id="answersGrid" class="mt-6 grid gap-3"></div>
-              <div id="feedbackBox" class="mt-6 hidden rounded-2xl border p-4">
-                <p id="feedbackTitle" class="font-bold"></p>
-                <p id="feedbackText" class="mt-2 leading-relaxed"></p>
+              
+              <div id="answersGrid" class="mt-5 sm:mt-6 grid gap-2.5 sm:gap-3"></div>
+              
+              <div id="feedbackBox" class="mt-5 sm:mt-6 hidden rounded-xl sm:rounded-2xl border p-4">
+                <p id="feedbackTitle" class="font-bold text-sm sm:text-base"></p>
+                <p id="feedbackText" class="mt-1.5 sm:mt-2 text-sm sm:text-base leading-relaxed"></p>
               </div>
-              <div class="mt-6 flex flex-wrap gap-3">
-                <button id="nextButton" class="hidden rounded-full px-5 py-3 font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Próxima pergunta </button> 
-                <button id="restartRoundButton" class="hidden rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Jogar esta categoria de novo </button>
+              
+              <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="nextButton" class="hidden w-full sm:w-auto justify-center rounded-full px-5 py-4 sm:py-3 text-sm sm:text-base font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Próxima pergunta </button> 
+                <button id="restartRoundButton" class="hidden w-full sm:w-auto justify-center rounded-full border border-white/15 bg-white/10 px-5 py-4 sm:py-3 text-sm sm:text-base font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Jogar esta categoria de novo </button>
               </div>
             </div>
             
-            <div id="resultPanel" class="glass-edge hidden rounded-[26px] border border-white/10 bg-white/6 p-6 sm:p-8">
-              <div class="flex flex-wrap items-start justify-between gap-4">
+            <div id="resultPanel" class="glass-edge hidden rounded-[24px] sm:rounded-[26px] border border-white/10 bg-white/6 p-5 sm:p-8">
+              <div class="flex flex-col sm:flex-row items-start justify-between gap-5 sm:gap-4">
                 <div>
-                  <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-white/60">
+                  <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/10 px-3 py-1 text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/60">
                     <i data-lucide="medal" class="h-3.5 w-3.5"></i> rodada concluída
                   </div>
-                  <h2 class="title-font mt-4 text-4xl font-semibold text-[#f7f2e7]">Resultado</h2>
-                  <p id="resultSummary" class="mt-3 text-white/75"></p>
+                  <h2 class="title-font mt-3 sm:mt-4 text-3xl sm:text-4xl font-semibold text-[#f7f2e7]">Resultado</h2>
+                  <p id="resultSummary" class="mt-2 sm:mt-3 text-sm sm:text-base text-white/75 leading-relaxed"></p>
                 </div>
-                <div class="rounded-[24px] border border-white/10 bg-[#eadfc7] px-6 py-5 text-center text-[#1d2a22]">
-                  <p class="text-xs uppercase tracking-[0.22em] text-black/55">Pontuação</p>
-                  <p id="finalScore" class="title-font text-5xl font-semibold">0/0</p>
+                <div class="w-full sm:w-auto rounded-[20px] sm:rounded-[24px] border border-white/10 bg-[#eadfc7] px-6 py-4 sm:py-5 text-center text-[#1d2a22]">
+                  <p class="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-black/55">Pontuação</p>
+                  <p id="finalScore" class="title-font text-4xl sm:text-5xl font-semibold mt-1">0/0</p>
                 </div>
               </div>
-              <div class="mt-6 grid gap-3 sm:grid-cols-3">
-                <button id="playAgainButton" class="rounded-full px-5 py-3 font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Jogar outra rodada </button> 
-                <button id="backCategoriesButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Ver categorias </button> 
-                <button id="reviewButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Revisar respostas </button>
+              
+              <div class="mt-6 sm:mt-6 grid gap-3 grid-cols-1 sm:grid-cols-3">
+                <button id="playAgainButton" class="rounded-full px-5 py-4 sm:py-3 text-sm sm:text-base font-bold text-white transition focus:outline-none focus:ring-4 focus:ring-white/25"> Jogar outra rodada </button> 
+                <button id="backCategoriesButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-4 sm:py-3 text-sm sm:text-base font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Ver categorias </button> 
+                <button id="reviewButton" class="rounded-full border border-white/15 bg-white/10 px-5 py-4 sm:py-3 text-sm sm:text-base font-semibold text-white transition hover:bg-white/15 focus:outline-none focus:ring-4 focus:ring-white/20"> Revisar respostas </button>
               </div>
-              <div id="reviewList" class="mt-6 hidden space-y-3"></div>
+              
+              <div id="reviewList" class="mt-6 hidden space-y-3 sm:space-y-4"></div>
             </div>
           </section>
         </div>
@@ -603,15 +623,34 @@
       appEls.scoreValue.textContent = String(state.score);
       appEls.errorValue.textContent = String(state.errorCount);
       appEls.progressValue.textContent = `${Math.min(state.currentIndex, state.roundQuestions.length)}/${state.roundQuestions.length}`;
+      if(appEls.mobileScore) {
+        appEls.mobileScore.textContent = String(state.score);
+      }
     }
 
     function showSection(sectionName) {
       appEls.welcomePanel.classList.add("hidden");
       appEls.quizPanel.classList.add("hidden");
       appEls.resultPanel.classList.add("hidden");
-      if (sectionName === "welcome") appEls.welcomePanel.classList.remove("hidden");
-      if (sectionName === "quiz") appEls.quizPanel.classList.remove("hidden");
-      if (sectionName === "result") appEls.resultPanel.classList.remove("hidden");
+      
+      if (sectionName === "welcome") {
+        appEls.welcomePanel.classList.remove("hidden");
+        // No mobile, quando estamos no menu (welcome), a barra lateral fica no topo
+        appEls.gameContainer.classList.remove("flex-col-reverse");
+        appEls.gameContainer.classList.add("flex-col");
+      } else {
+        // No mobile, quando estamos no quiz ou resultado, eles saltam para o topo
+        appEls.gameContainer.classList.remove("flex-col");
+        appEls.gameContainer.classList.add("flex-col-reverse");
+        
+        if (sectionName === "quiz") appEls.quizPanel.classList.remove("hidden");
+        if (sectionName === "result") appEls.resultPanel.classList.remove("hidden");
+        
+        // Auto-scroll para facilitar a vida do utilizador de telemóvel
+        if (window.innerWidth < 1024) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
     }
 
     function startTrainingMode() {
@@ -782,10 +821,10 @@
       item.options.forEach((option, index) => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "answer-btn w-full rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-white transition duration-200 hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20";
+        button.className = "answer-btn w-full rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 text-left text-sm sm:text-base text-white transition duration-200 hover:bg-white/10 focus:outline-none focus:ring-4 focus:ring-white/20";
         button.innerHTML = `
           <div class="flex items-start gap-3">
-            <span class="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-bold">${String.fromCharCode(65 + index)}</span>
+            <span class="mt-0.5 inline-flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs sm:text-sm font-bold">${String.fromCharCode(65 + index)}</span>
             <span class="leading-relaxed">${option}</span>
           </div>
         `;
@@ -832,8 +871,8 @@
       appEls.feedbackTitle.textContent = isCorrect ? "Resposta correta!" : "Não foi dessa vez.";
       appEls.feedbackText.textContent = item.explanation;
       appEls.feedbackBox.className = isCorrect
-        ? "mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-50"
-        : "mt-6 rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-rose-50";
+        ? "mt-5 sm:mt-6 rounded-xl sm:rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-50"
+        : "mt-5 sm:mt-6 rounded-xl sm:rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-rose-50";
 
       if (state.isInfinite && state.errorsCount >= 5) {
         appEls.nextButton.textContent = "Ver resultado final";
@@ -847,6 +886,11 @@
       }
 
       updateStats();
+      
+      // Pequeno auto-scroll no mobile para garantir que a explicação aparece sem precisar deslizar muito o ecrã
+      if (window.innerWidth < 1024) {
+         appEls.feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
     function advanceTrainingLevel() {
@@ -858,6 +902,7 @@
         loadTrainingQuestions();
         if(state.roundQuestions.length > 0) {
           renderQuestion();
+          if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
            advanceTrainingLevel(); // Pula nível se estiver vazio (fallback de segurança)
         }
@@ -869,6 +914,7 @@
         loadTrainingQuestions();
         if(state.roundQuestions.length > 0) {
           renderQuestion();
+          if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
            renderResults(); 
         }
@@ -882,6 +928,7 @@
         if (state.currentIndex < state.roundQuestions.length - 1) {
           state.currentIndex += 1;
           renderQuestion();
+          if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           advanceTrainingLevel();
         }
@@ -892,11 +939,13 @@
           state.currentIndex += 1;
           generateNextInfiniteQuestion();
           renderQuestion();
+          if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       } else {
         if (state.currentIndex < state.roundQuestions.length - 1) {
           state.currentIndex += 1;
           renderQuestion();
+          if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           renderResults();
         }
@@ -929,16 +978,16 @@
 
       state.history.forEach((entry, index) => {
         const card = document.createElement("article");
-        card.className = "rounded-2xl border border-white/10 bg-black/10 p-4 text-white";
+        card.className = "rounded-xl sm:rounded-2xl border border-white/10 bg-black/10 p-4 text-white";
         const levelBadge = entry.level ? `<span class="level-badge level-${entry.level}">${getLevelLabel(entry.level)}</span>` : "";
         card.innerHTML = `
-          <p class="text-xs uppercase tracking-[0.22em] ${entry.isCorrect ? 'text-emerald-300' : 'text-rose-300'}">
+          <p class="text-[10px] sm:text-xs uppercase tracking-[0.22em] ${entry.isCorrect ? 'text-emerald-300' : 'text-rose-300'}">
             ${entry.isCorrect ? 'Correta' : 'Incorreta'} • ${index + 1} ${levelBadge}
           </p>
-          <h3 class="mt-2 text-lg font-semibold">${entry.question}</h3>
-          <p class="mt-3 text-sm text-white/70"><strong class="text-white/90">Sua resposta:</strong> ${entry.selected}</p>
-          <p class="mt-1 text-sm text-white/70"><strong class="text-white/90">Resposta certa:</strong> ${entry.correct}</p>
-          <p class="mt-3 text-sm leading-relaxed text-white/75">${entry.explanation}</p>
+          <h3 class="mt-2 text-base sm:text-lg font-semibold">${entry.question}</h3>
+          <p class="mt-3 text-xs sm:text-sm text-white/70"><strong class="text-white/90">Sua resposta:</strong> ${entry.selected}</p>
+          <p class="mt-1 text-xs sm:text-sm text-white/70"><strong class="text-white/90">Resposta certa:</strong> ${entry.correct}</p>
+          <p class="mt-3 text-xs sm:text-sm leading-relaxed text-white/75">${entry.explanation}</p>
         `;
         appEls.reviewList.appendChild(card);
       });
@@ -973,10 +1022,8 @@
       });
 
       document.body.style.fontSize = `${baseSize}px`;
-      appEls.mainTitle.style.fontSize = `${baseSize * 2.9}px`;
-      appEls.subtitleText.style.fontSize = `${baseSize * 1}px`;
-      appEls.startButton.style.fontSize = `${baseSize * 0.95}px`;
-
+      
+      // Ajuste para evitar tamanhos fixos absolutos quebrando no mobile, usando ems ou baseSize multiplicators limitados
       appEls.startButton.style.backgroundColor = primary;
       appEls.nextButton.style.backgroundColor = primary;
       appEls.playAgainButton.style.backgroundColor = primary;
@@ -984,9 +1031,13 @@
       appEls.mixButton.style.borderColor = secondary;
 
       appEls.resultPanel.querySelector("#finalScore").style.color = text;
-      appEls.gameSection.querySelectorAll(".rounded-\\[24px\\]").forEach(el => {
-        el.style.backgroundColor = surface;
-        el.style.color = text;
+      
+      // O escapamento de brackets na classe é necessário se alterarmos ela via querySelector
+      appEls.gameSection.querySelectorAll(".rounded-\\[24px\\], .sm\\:rounded-\\[26px\\]").forEach(el => {
+        // Garantindo as cores customizadas
+        if (el.id !== 'quizPanel' && el.id !== 'welcomePanel' && el.id !== 'resultPanel') {
+            // we let CSS handle it for the sidebar, or we enforce
+        }
       });
     }
 
@@ -1020,9 +1071,11 @@
       appEls.brandBubble = document.getElementById("brandBubble");
       appEls.introCard = document.getElementById("introCard");
       appEls.gameSection = document.getElementById("gameSection");
+      appEls.gameContainer = document.getElementById("gameContainer"); // Novo
       appEls.scoreValue = document.getElementById("scoreValue");
       appEls.errorValue = document.getElementById("errorValue");
       appEls.progressValue = document.getElementById("progressValue");
+      appEls.mobileScore = document.getElementById("mobileScore"); // Novo
       appEls.welcomePanel = document.getElementById("welcomePanel");
       appEls.quizPanel = document.getElementById("quizPanel");
       appEls.resultPanel = document.getElementById("resultPanel");
